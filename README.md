@@ -36,3 +36,7 @@ List any software, tools, or global packages needed:
 ### If I want to work on this project, where should I start from?
 
 TBA
+
+## Resources:
+- Use the voltage_management folder on zotero: psu-peg/SLR/Grid Services/voltage_management/
+- Research Questions are in the RQs.txt file in this repo.
