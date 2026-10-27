@@ -6,9 +6,9 @@
 
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
-<meta name="author" content="Your Name">
+<meta name="author" content="Midrar">
 
-<title>Engineering Calculation Report</title>
+<title>KVL derivation for three-phase unbalanced system</title>
 <style>
 /* Default styles provided by pandoc.
 ** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
@@ -27,41 +27,6 @@ ul.task-list li input[type="checkbox"] {
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
 }
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
 </style>
 
 
@@ -76,9 +41,6 @@ pre > code.sourceCode > span > a:first-child::before { text-decoration: underlin
 <script src="derivation_files/libs/bootstrap/bootstrap.min.js"></script>
 <link href="derivation_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
 <link href="derivation_files/libs/bootstrap/bootstrap-00cad9988208422f603cca1c9218343b.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
-<script src="derivation_files/libs/quarto-diagram/mermaid.min.js"></script>
-<script src="derivation_files/libs/quarto-diagram/mermaid-init.js"></script>
-<link href="derivation_files/libs/quarto-diagram/mermaid.css" rel="stylesheet">
 
   <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
   <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@4/tex-chtml.js" type="text/javascript"></script>
@@ -120,7 +82,7 @@ window.Quarto = {
 
 <header id="title-block-header" class="quarto-title-block default">
 <div class="quarto-title">
-<h1 class="title">Engineering Calculation Report</h1>
+<h1 class="title">KVL derivation for three-phase unbalanced system</h1>
 </div>
 
 
@@ -130,7 +92,7 @@ window.Quarto = {
     <div>
     <div class="quarto-title-meta-heading">Author</div>
     <div class="quarto-title-meta-contents">
-             <p>Your Name </p>
+             <p>Midrar </p>
           </div>
   </div>
     
@@ -158,61 +120,130 @@ window.Quarto = {
 <h2 class="anchored" data-anchor-id="equations-derivation">Equations Derivation</h2>
 <p><strong>NOTE: The paper uses DistFlow equations, which we are going to use in this work.</strong></p>
 <p>Consider the following single line diagram:</p>
-<div id="fig-schematic" class="quarto-layout-panel">
+<div id="fig-SLD" class="quarto-layout-panel">
 <figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-schematic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div aria-describedby="fig-SLD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="quarto-layout-row">
 <div class="quarto-layout-cell" style="flex-basis: 100.0%;justify-content: flex-start;">
 <img src="./figures_qmd/Barans_paper_sld.png" class="img-fluid figure-img" style="width:80.0%">
 </div>
 </div>
 </div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-schematic-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-SLD-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;1: A single Line Diagram (SLD) for an <span class="math inline">\(n\)</span> bus system. The loads are unknown for now. The Apparent Power (<span class="math inline">\(\bar{S}\)</span>) flowing between each bus is shown.
 </figcaption>
 </figure>
 </div>
-<p>For each load, we consider <span class="math inline">\(P_{L_{n}}\)</span> and <span class="math inline">\(Q_{L_{n}}\)</span>, indicating load power flow at each load.</p>
-<p>Below is the step-by-step calculation for the area of a circle.</p>
-<div id="e9cd16ba" class="cell" data-execution_count="1">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> handcalcs.render</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="im">from</span> math <span class="im">import</span> pi</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>radius <span class="op">=</span> <span class="fl">5.0</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p><strong>For each load, we consider <span class="math inline">\(P_{L_{n}}\)</span> and <span class="math inline">\(Q_{L_{n}}\)</span>, indicating load power flow at each load.</strong></p>
+<p>Each line has an impedance, <span class="math inline">\(Z_{n} = r_{n}+jx_{n}\)</span>. The apparent power flow at each line is given by:</p>
+<p><span class="math display">\[\bar{S_{n}} = P_{n}+jQ_{n}\]</span></p>
+<p>For instance, at bus <span class="math inline">\(i+1:\)</span> <span class="math display">\[\bar{S}_{i+1} = P_{i+1}+jQ_{i+1}\]</span></p>
+<p>I think it is easier to see this if we look at the power flow between two buses. Consider the power flow between buses 0 &amp; <span class="math inline">\(i-1\)</span>:</p>
+<p><span id="eq-KCL"><span class="math display">\[\underbrace{\bar{P}_{0}}_{\text{Power leaving bus $0$}} = \underbrace{\bar{P}_{0, loss}}_{\text{Losses}} + \underbrace{\bar{P}_{i-1}}_{\text{Power entering bus $i-1$}} +\underbrace{\bar{P}_{i-1, load}}_{\text{Power consumed by bus $i-1$ load}} \tag{1}\]</span></span></p>
+<section id="decomposing-the-losses-term-in-equation-eq-kcl" class="level3">
+<h3 class="anchored" data-anchor-id="decomposing-the-losses-term-in-equation-eq-kcl">Decomposing the Losses term in equation <a href="#eq-KCL" class="quarto-xref">Equation&nbsp;1</a></h3>
+<p><span class="math display">\[P_{losses} = r |I^{2}|\]</span></p>
+<p>At any given bus <span class="math inline">\(n\)</span>:</p>
+<p><span id="eq-power_losses"><span class="math display">\[P_{n,losses} = r_{n} |I^{2}_{n}| \tag{2}\]</span></span></p>
+<p>Recall:</p>
+<p><span class="math display">\[\bar{S} = \bar{I}^{*} \bar{V} = \bar{P}+j\bar{Q}\]</span></p>
+<p>Wherein the magnitude of the apparent power is given by:</p>
+<p><span class="math display">\[|S| = |I|~|V| = \sqrt{P^{2} + Q^{2}}\]</span></p>
+<p>Squaring both sides:</p>
+<p><span class="math display">\[|S|^{2} = |I|^{2}~|V|^{2} = P^{2}+Q^{2}\]</span></p>
+<p>Solving for the current, <span class="math inline">\(I\)</span>:</p>
+<p><span class="math display">\[|I|^{2} = \frac{P^{2} + Q^{2}}{|V|^{2}}\]</span></p>
+<p>At any given bus <span class="math inline">\(n\)</span>, the current is:</p>
+<p><span id="eq-current"><span class="math display">\[|I_{n}|^{2} = \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}} \tag{3}\]</span></span></p>
+<p>substituting the current equation <a href="#eq-current" class="quarto-xref">Equation&nbsp;3</a> into <a href="#eq-power_losses" class="quarto-xref">Equation&nbsp;2</a> we get:</p>
+<p><span id="eq-full-Plosses"><span class="math display">\[P_{n,losses} = r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}} \tag{4}\]</span></span></p>
+<p>Subtituting <a href="#eq-full-Plosses" class="quarto-xref">Equation&nbsp;4</a> in the KCL between buses <span class="math inline">\(0\)</span> and <span class="math inline">\(i-1\)</span> in <a href="#eq-KCL" class="quarto-xref">Equation&nbsp;1</a>, we get:</p>
+<p><span id="eq-DistFlow-Real-Power-Equation"><span class="math display">\[\underbrace{\bar{P}_{n}}_{\text{Power leaving bus $n$}} = \underbrace{r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}}_{\text{Losses}} + \underbrace{\bar{P}_{n+1}}_{\text{Power entering bus $n+1$}} +\underbrace{\bar{P}_{n+1, load}}_{\text{Power consumed by bus $n+1$ load}} \tag{5}\]</span></span></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
 </div>
-<div id="4190d5cb" class="cell" data-execution_count="2">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="op">%%</span>render</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="co">#| echo: false</span></span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>Area <span class="op">=</span> pi <span class="op">*</span> radius<span class="op">**</span><span class="dv">2</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<div class="cell-output cell-output-display cell-output-markdown">
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-DistFlow-Real-Power-Equation" class="quarto-xref">Equation&nbsp;5</a> is the real power DistFlow Equation. This equation can be used for any power flow calculations.</p>
+</div>
+</div>
+<p>Similarly, the reactive power can be calculated in a similar manner:</p>
+<p><span id="eq-DistFlow-Reactive-Power-Equation"><span class="math display">\[\underbrace{\bar{Q}_{n}}_{\text{Q leaving bus $n$}} = \underbrace{x_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}}_{\text{Losses}} + \underbrace{\bar{Q}_{n+1}}_{\text{Q entering bus $n+1$}} +\underbrace{\bar{Q}_{n+1, load}}_{\text{Q consumed by bus $n+1$ load}} \tag{6}\]</span></span></p>
+</section>
+</section>
+<section id="deriving-the-voltage-equation" class="level2">
+<h2 class="anchored" data-anchor-id="deriving-the-voltage-equation">Deriving the Voltage Equation:</h2>
+<p>Applying KVL to buses, <span class="math inline">\(i\)</span> and <span class="math inline">\(i-1\)</span> in <a href="#fig-SLD" class="quarto-xref">Figure&nbsp;1</a>:</p>
+<p><span id="eq-KVL"><span class="math display">\[\bar{V}_{i-1} = \bar{Z}_{i-1}~\bar{I}_{i-1} + \bar{V}_{i} \tag{7}\]</span></span></p>
+<p>The current complex value can be solved for in a similar manner as in equation <a href="#eq-current" class="quarto-xref">Equation&nbsp;3</a>:</p>
+<p><span class="math display">\[\bar{V}_{n}~\bar{I}_{n}^{*} = \bar{P}_{n}+{j\bar{Q}}_{n}\]</span></p>
+<p>Solving for <span class="math inline">\(\bar{I}_{n}^{*}\)</span>:</p>
+<p><span id="eq-complex-current"><span class="math display">\[\bar{I}_{n} = \frac{\bar{P}_{n}-j\bar{Q}_{n}}{\bar{V}_{n}^{*}} \tag{8}\]</span></span></p>
+<p>Subtituting <a href="#eq-complex-current" class="quarto-xref">Equation&nbsp;8</a> in <a href="#eq-KVL" class="quarto-xref">Equation&nbsp;7</a> &amp; solving for <span class="math inline">\(\bar{V}_{i}\)</span>:</p>
+<p><span id="eq-KVL2"><span class="math display">\[\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1} \tag{9}\]</span></span></p>
+<p><span class="math display">\[\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\frac{\bar{P}_{i-1}-j\bar{Q}_{i-1}}{\bar{V}_{i-1}^{*}}\]</span></p>
+<p>We can then extend this to get only the magnitude of the voltage:</p>
+<p>Recall <span class="math inline">\(|a^{2} - b^{2}| = (a-b)(a^{*} - b^{*})\)</span>:</p>
+<p><span class="math display">\[|V^{2}_{i}| = (\bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1})~(\bar{V}^{*}_{i-1} - \bar{Z}^{*}_{i-1}~\bar{I}^{*}_{i-1})\]</span></p>
+<p>Multiplying both terms, we end up with:</p>
+<p><span id="eq-voltage-ref1"><span class="math display">\[|V^{2}_{i}| = |V^{2}_{i-1}| - 2~\Re \{\underbrace{\bar{V}^{*}_{i-1}~\bar{I}_{i-1}}_{\substack{\text{Apparent} \\ \text {Power} \\ \text{Conjugate}}}~\bar{Z}_{i-1}\} + |Z^{2}_{i-1}|~|I^{2}_{i-1}| \tag{10}\]</span></span></p>
+<p>Recall <span class="math inline">\(\bar{S}^{*}_{i-1} = \bar{V}^{*}_{i-1}~\bar{I}_{i-1} = \bar{P}_{i-1} - j\bar{Q}_{i-1}\)</span></p>
+<p>So the middle term can be decomposed such that:</p>
+<p><span class="math display">\[\bar{V}^{*}_{i-1}~\bar{I}_{i-1}~\bar{Z}_{i-1} = (\bar{P}_{i-1} - j\bar{Q}_{i-1})(r_{i-1}+jx_{i-1})\]</span></p>
+<p>Multiplying and obtaining only the real part because we are trying to calculate the magnitude:</p>
+<p><span id="eq-voltage-ref2"><span class="math display">\[\Re \{\bar{Z}_{i-1}~\bar{V}^{*}_{i-1}~\bar{I}_{i-1}\} = r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1} \tag{11}\]</span></span></p>
+<p>The last term in <a href="#eq-voltage-ref1" class="quarto-xref">Equation&nbsp;10</a> can be simplified further. Recall that <span class="math inline">\(|Z^{2}_{i-1}| = r^{2}_{i-1} + x^{2}_{i-1}\)</span> and <span class="math inline">\(|I^{2}_{i-1}| = \frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}^{2}|}\)</span></p>
+<p><span id="eq-voltage-ref3"><span class="math display">\[|Z^{2}_{i-1}|~|I^{2}_{i-1}| = (r^{2}_{i-1} + x^{2}_{i-1})~(\frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}^{2}|}) \tag{12}\]</span></span></p>
+<p>Subtituting <a href="#eq-voltage-ref2" class="quarto-xref">Equation&nbsp;11</a> and <a href="#eq-voltage-ref3" class="quarto-xref">Equation&nbsp;12</a> in <a href="#eq-voltage-ref1" class="quarto-xref">Equation&nbsp;10</a>:</p>
+<p><span id="eq-voltage-distflow"><span class="math display">\[|V^{2}_{i}| = |V^{2}_{i-1}| - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+(r^{2}_{i-1} + x^{2}_{i-1})~\frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}|^{2}} \tag{13}\]</span></span></p>
+<div class="callout callout-style-simple callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p><a href="#eq-voltage-distflow" class="quarto-xref">Equation&nbsp;13</a> is the Voltage Magnitude DistFlow Equation. This equation can be used for any <span class="math inline">\(n-bus\)</span> power system.</p>
+</div>
+</div>
+</section>
+<section id="three-phase-unbalanced-system" class="level2">
+<h2 class="anchored" data-anchor-id="three-phase-unbalanced-system">Three-phase Unbalanced System</h2>
+<p>Using the same KVL we used before, <a href="#eq-KVL2" class="quarto-xref">Equation&nbsp;9</a>, we can set a system of equations for buses <span class="math inline">\(i\)</span> and <span class="math inline">\(j\)</span> such that:</p>
 <p><span class="math display">\[
-\begin{aligned}
-\mathrm{Area} &amp;= \pi \cdot \left( \mathrm{radius} \right) ^{ 2 }  = 3.142 \cdot \left( 5.000 \right) ^{ 2 } &amp;= 78.540  
-\end{aligned}
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{j} \\
+\bar{V}^{b}_{j} \\
+\bar{V}^{c}_{j}
+\end{bmatrix}
+-
+\begin{bmatrix}
+\bar{Z}^{aa}_{ij} &amp; \bar{Z}^{ab}_{ij} &amp; \bar{Z}^{ac}_{ij}\\
+\bar{Z}^{ba}_{ij} &amp; \bar{Z}^{ab}_{ij} &amp; \bar{Z}^{bc}_{ij}\\
+\bar{Z}^{ca}_{ij} &amp; \bar{Z}^{cb}_{ij} &amp; \bar{Z}^{cc}_{ij}
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a}_{ij} \\
+\bar{I}^{b}_{ij} \\
+\bar{I}^{c}_{ij}
+\end{bmatrix}
 \]</span></p>
-</div>
-</div>
-<div class="cell" data-layout-align="default">
-<div class="cell-output-display">
-<div id="fig-flowchart" class="quarto-float quarto-figure quarto-figure-center anchored">
-<figure class="quarto-float quarto-float-fig figure">
-<div aria-describedby="fig-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div>
-<pre class="mermaid mermaid-js" data-label="fig-flowchart">graph LR
-    A[Raw Data] --&gt; B(Poetry Env)
-    B --&gt; C{Quarto Engine}
-    C --&gt;|Executes Code| D[handcalcs Math]
-    C --&gt;|Renders Layout| E[HTML / PDF Report]
-</pre>
-</div>
-</div>
-<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-flowchart-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-Figure&nbsp;2: The programmatic workflow of an engineering calculation report.
-</figcaption>
-</figure>
-</div>
-</div>
-</div>
+<p>For any given bus, the voltage equation can extracted from the above matrix form. For instance:</p>
+<p><span class="math display">\[\bar{V}^{a}_{i} = \bar{V}^{a}_{j} - \bar{Z}_{aa}~\bar{I}^{a}_{ij} - \bar{Z}_{ab}~\bar{I}^{b}_{ij} - \bar{Z}_{ac}~\bar{I}^{c}_{ij}\]</span></p>
 </section>
 
 </main>
