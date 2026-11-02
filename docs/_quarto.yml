@@ -1,0 +1,58 @@
+project:
+  type: book
+
+bibliography: references.bib
+
+book:
+  title: "Advanced Power System Analysis"
+  author: "Midrar Adham"
+  chapters:
+    - text: "Homepage"
+      file: index.qmd
+    - text: "Introduction"
+      file: sections/_ch1_intro.qmd
+    - text: "Literature Review"
+      file: sections/_ch2_gan_low_lit_review.qmd
+    - text: "DistFlow Equations"
+      file: sections/_ch2_eqautions_derivation.qmd
+    - text: "Testing Setup"
+      file: sections/_ch3_initial_testing.qmd
+    - text: "Equations Derivation for Inverter Reactive Power"
+      file: sections/_ch4_inverter_reactive_power_derivation.qmd
+    - references.qmd
+    # - text: "Voltage Equation Derivations"
+    #   file: voltage_eq.qmd
+
+format:
+  html:
+  # TOC:
+    toc: true
+    toc-depth: 3
+    number-depth: 3
+    link-external-newwindow: true
+    smooth-scroll: true
+  # Page layout settings
+    # page-layout: article
+    page-layout: full
+    # page-layout: custom
+    # Themes:
+    theme:
+      dark: darkly
+      light: Minu
+    # theme: Minu
+    # theme: solar
+    # theme: superhero
+    # theme: yeti
+    # theme: vapor
+    # theme: cerulean
+    # theme: sandstone
+    # theme: quartz
+    # Grid Stuff:
+    grid:
+      sidebar-width: 306px
+      body-width: 2000px
+      margin-width: 306px
+      gutter-width: 0.1rem
+    number-sections: true
+  pdf:
+    number-sections: true

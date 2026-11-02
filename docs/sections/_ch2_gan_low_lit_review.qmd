@@ -1,0 +1,97 @@
+## Background Information
+
+**NOTE: This file contains supporting matrix algebra and the fuller multiphase branch-flow formulation of Gan and Low [@gan2014convex]. The working equations are in `ch2_voltage_reactive_equations.qmd`.**
+
+## Three-phase Branch Power Matrix
+
+Recall that $\mathbf{\bar V}_i$ and $\mathbf{\bar I}_{ij}$ are $3\times1$ column vectors. We previously used the per-phase complex power vector:
+
+$$\mathbf{\bar s}_{ij}=\begin{bmatrix}P_{ij}^a+jQ_{ij}^a\\P_{ij}^b+jQ_{ij}^b\\P_{ij}^c+jQ_{ij}^c\end{bmatrix}$$
+
+Gan and Low also use the full branch power matrix:
+
+$$\mathbf{\bar S}_{ij}=\mathbf{\bar V}_i\mathbf{\bar I}_{ij}^{H}$$ {#eq-background-branch-power-matrix}
+
+Expanding the matrix multiplication:
+
+$$
+\mathbf{\bar S}_{ij}=
+\begin{bmatrix}
+\bar V_i^a(\bar I_{ij}^a)^* & \bar V_i^a(\bar I_{ij}^b)^* & \bar V_i^a(\bar I_{ij}^c)^*\\
+\bar V_i^b(\bar I_{ij}^a)^* & \bar V_i^b(\bar I_{ij}^b)^* & \bar V_i^b(\bar I_{ij}^c)^*\\
+\bar V_i^c(\bar I_{ij}^a)^* & \bar V_i^c(\bar I_{ij}^b)^* & \bar V_i^c(\bar I_{ij}^c)^*
+\end{bmatrix}
+$$
+
+Note that the **diagonal elements** are the conventional complex powers for each phase:
+
+$$\operatorname{diag}(\mathbf{\bar S}_{ij})=\mathbf{\bar s}_{ij}$$
+
+The **off-diagonal elements** are cross-phase voltage-current products. They do not represent extra downstream branches or separate real/reactive phase powers. The full $3\times3$ matrix is useful for Gan and Low's branch-flow and optimization formulations, but it is not required just to substitute phase power into KVL.
+
+## Derive the Magnitude of the Voltage
+
+Following the same approach as in @eq-KVL3, we can obtain squared voltage magnitudes using the three-phase KVL equation:
+
+$$\mathbf{\bar V}_j=\mathbf{\bar V}_i-\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij}$$
+
+To retain all cross-phase voltage products, multiply the equation on the right by its **Hermitian transpose**:
+
+$$\mathbf{\bar V}_j\mathbf{\bar V}_j^H=(\mathbf{\bar V}_i-\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij})(\mathbf{\bar V}_i-\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij})^H$$ {#eq-kvl-complex-form-v-magnitude}
+
+The Hermitian transpose, denoted by $H$, means **conjugate transpose**; it does **not** mean extracting the diagonal. A $3\times1$ voltage vector times its $1\times3$ conjugate transpose produces a $3\times3$ matrix.
+
+### Solving for the left hand side of @eq-kvl-complex-form-v-magnitude
+
+$$
+\mathbf{\bar V}_j\mathbf{\bar V}_j^{H}
+=\begin{bmatrix}\bar V_j^a\\\bar V_j^b\\\bar V_j^c\end{bmatrix}_{3\times1}
+\begin{bmatrix}(\bar V_j^a)^*&(\bar V_j^b)^*&(\bar V_j^c)^*\end{bmatrix}_{1\times3}
+=\begin{bmatrix}
+|\bar V_j^a|^2&\bar V_j^a(\bar V_j^b)^*&\bar V_j^a(\bar V_j^c)^*\\
+\bar V_j^b(\bar V_j^a)^*&|\bar V_j^b|^2&\bar V_j^b(\bar V_j^c)^*\\
+\bar V_j^c(\bar V_j^a)^*&\bar V_j^c(\bar V_j^b)^*&|\bar V_j^c|^2
+\end{bmatrix}_{3\times3}
+$$ {#eq-voltage-matrix-magnitude}
+
+Note that the diagonal elements are **squared** voltage magnitudes. The off-diagonal elements remain complex cross-phase voltage products.
+
+Gan and Low define the voltage matrix as:
+
+$$\mathbf{\bar W}_j=\mathbf{\bar V}_j\mathbf{\bar V}_j^H$$ {#eq-voltage-wj}
+
+Similarly:
+
+$$\mathbf{\bar W}_i=\mathbf{\bar V}_i\mathbf{\bar V}_i^H$$ {#eq-voltage-wi}
+
+### Solving for the right hand side of @eq-kvl-complex-form-v-magnitude
+
+We can apply the same Hermitian transpose to the right-hand side:
+
+$$\mathbf{\bar W}_j=(\mathbf{\bar V}_i-\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij})(\mathbf{\bar V}_i^H-\mathbf{\bar I}_{ij}^H\mathbf{\bar Z}_{ij}^H)$$
+
+::: {.callout-note appearance="simple"}
+## Voltage Eq. Note
+
+$$(\mathbf{\bar Z}\mathbf{\bar I})^H=\mathbf{\bar I}^H\mathbf{\bar Z}^H$$
+
+The multiplication order reverses because $(AB)^H=B^HA^H$. This is a property of the conjugate transpose, not merely a rule for fixing dimensions.
+:::
+
+Expanding the right-hand side:
+
+$$\mathbf{\bar W}_j=\mathbf{\bar V}_i\mathbf{\bar V}_i^H-\mathbf{\bar V}_i\mathbf{\bar I}_{ij}^H\mathbf{\bar Z}_{ij}^H-\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij}\mathbf{\bar V}_i^H+\mathbf{\bar Z}_{ij}\mathbf{\bar I}_{ij}\mathbf{\bar I}_{ij}^H\mathbf{\bar Z}_{ij}^H$$ {#eq-voltage-three-phase-kvl-matrix}
+
+We previously defined the voltage matrix in @eq-voltage-wi and the branch-power matrix in @eq-background-branch-power-matrix. Accordingly, we can define the current outer-product matrix as:
+
+$$\mathbf{\bar L}_{ij}=\mathbf{\bar I}_{ij}\mathbf{\bar I}_{ij}^H$$
+
+Therefore, @eq-voltage-three-phase-kvl-matrix can be written as:
+
+$$\boxed{\mathbf{\bar W}_j=\mathbf{\bar W}_i-\mathbf{\bar S}_{ij}\mathbf{\bar Z}_{ij}^H-\mathbf{\bar Z}_{ij}\mathbf{\bar S}_{ij}^H+\mathbf{\bar Z}_{ij}\mathbf{\bar L}_{ij}\mathbf{\bar Z}_{ij}^H}$$ {#eq-background-voltage-matrix}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-background-voltage-matrix is an exact squared-voltage **matrix** relationship derived from KVL. The term $\mathbf{\bar Z}_{ij}\mathbf{\bar L}_{ij}\mathbf{\bar Z}_{ij}^H$ is quadratic in line current; it is the outer product of the line voltage-drop vector with itself. Its diagonal is not the same as the real-power loss. For our immediate voltage–reactive-power work, the per-phase power equations and KVL are sufficient as starting equations, so we can keep this fuller derivation for background.
+:::

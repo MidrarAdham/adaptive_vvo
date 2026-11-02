@@ -23,7 +23,7 @@ In this document, I review two papers. The first papers introduces the derivatio
 Consider the following single line diagram:
 
 ::: {#fig-SLD layout-ncol=1}
-![](./figures_qmd/Barans_paper_sld.png){width=80%}
+![ht](./figures_qmd/Barans_paper_sld.png){width=80%}
 
 A single Line Diagram (SLD) for an $n$ bus system. The loads are unknown for now. The Apparent Power ($\bar{S}$) flowing between each bus is shown.
 :::

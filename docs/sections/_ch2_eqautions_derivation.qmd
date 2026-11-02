@@ -1,0 +1,253 @@
+## Equations Derivation
+
+**NOTE: Baran and Wu use the DistFlow equations for a balanced, single-phase equivalent radial distribution system. We use these equations as a starting point for our unbalanced three-phase work.**
+
+Consider the following single line diagram:
+
+::: {#fig-SLD layout-ncol="1"}
+![ht](/figures_qmd/Barans_paper_sld.png){width="80%"}
+
+A single Line Diagram (SLD) for an $n$ bus system. The loads are unknown for now. The complex power ($\bar{S}$) flowing between each bus is shown.
+:::
+
+**For each load, we consider** $P_{L,n}$ and $Q_{L,n}$, indicating real and reactive power consumed at bus $n$. Positive load means consumption.
+
+Each line has an impedance, $\bar{Z}_{n} = r_{n}+jx_{n}$. The sending-end complex power flow on each line is given by:
+
+$$\bar{S}_{n} = P_{n}+jQ_{n}$$
+
+For instance, for the line leaving bus $i+1$:
+
+$$\bar{S}_{i+1} = P_{i+1}+jQ_{i+1}$$
+
+## Deriving the Real and Reactive Power Equations
+
+I think it is easier to see this if we look at the power flow between two consecutive buses. Consider the power flow between buses $n$ and $n+1$. We define $P_n$ as the power leaving bus $n$ and entering line $(n,n+1)$:
+
+$$\underbrace{P_{n}}_{\text{Power leaving bus $n$}} = \underbrace{P_{n,loss}}_{\text{Line loss}} + \underbrace{P_{n+1}}_{\text{Power leaving bus $n+1$}} + \underbrace{P_{L,n+1}}_{\text{Load at bus $n+1$}}$$ {#eq-KCL}
+
+### Decomposing the Losses term in equation @eq-KCL
+
+$$P_{loss} = r |I|^{2}$$
+
+At any given bus $n$:
+
+$$P_{n,loss} = r_{n} |I_{n}|^{2}$$ {#eq-power_losses}
+
+Recall:
+
+$$\bar{S} = \bar{V}\bar{I}^{*} = P+jQ$$
+
+Wherein the magnitude of the apparent power is given by:
+
+$$|S| = |I|~|V| = \sqrt{P^{2} + Q^{2}}$$
+
+Squaring both sides:
+
+$$|S|^{2} = |I|^{2}~|V|^{2} = P^{2}+Q^{2}$$
+
+Solving for the squared current magnitude:
+
+$$|I|^{2} = \frac{P^{2} + Q^{2}}{|V|^{2}}$$
+
+For the line leaving bus $n$, the squared current magnitude is:
+
+$$|I_{n}|^{2} = \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}$$ {#eq-current}
+
+substituting the current equation @eq-current into @eq-power_losses we get:
+
+$$P_{n,loss} = r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|\bar{V}_{n}|^{2}}$$ {#eq-full-Plosses}
+
+Substituting @eq-full-Plosses in the power balance between buses $n$ and $n+1$ in @eq-KCL, we get:
+
+$$\underbrace{P_{n}}_{\text{Power leaving bus $n$}} = \underbrace{r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|\bar{V}_{n}|^{2}}}_{\text{Line loss}} + \underbrace{P_{n+1}}_{\text{Power leaving bus $n+1$}} +\underbrace{P_{L,n+1}}_{\text{Load at bus $n+1$}}$$ {#eq-DistFlow-Real-Power-Equation}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-DistFlow-Real-Power-Equation is the real power DistFlow Equation. This is the exact branch real-power balance for the single-phase equivalent line model, assuming the bus has one downstream line and no additional injection. For a branching feeder, we also account for every outgoing branch.
+:::
+
+Similarly, the reactive power can be calculated in a similar manner:
+
+$$\underbrace{Q_{n}}_{\text{Q leaving bus $n$}} = \underbrace{x_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|\bar{V}_{n}|^{2}}}_{\text{Reactive power absorbed in the line}} + \underbrace{Q_{n+1}}_{\text{Q leaving bus $n+1$}} +\underbrace{Q_{L,n+1}}_{\text{Q consumed by bus $n+1$ load}}$$ {#eq-DistFlow-Reactive-Power-Equation}
+
+## Deriving the Voltage Equation:
+
+Applying KVL to buses, $i$ and $i-1$ in @fig-SLD:
+
+$$\bar{V}_{i-1} = \bar{Z}_{i-1}~\bar{I}_{i-1} + \bar{V}_{i}$$ {#eq-KVL}
+
+The current complex value can be solved for in a similar manner as in equation @eq-current:
+
+$$\bar{V}_{n}~\bar{I}_{n}^{*} = P_{n}+jQ_{n}$$
+
+Taking the complex conjugate and solving for $\bar{I}_{n}$:
+
+$$\bar{I}_{n} = \frac{P_{n}-jQ_{n}}{\bar{V}_{n}^{*}}$$ {#eq-complex-current}
+
+Substituting @eq-complex-current in @eq-KVL & solving for $\bar{V}_{i}$:
+
+$$\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1}$$ {#eq-KVL2}
+
+$$\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\frac{P_{i-1}-jQ_{i-1}}{\bar{V}_{i-1}^{*}}$$
+
+We can then extend this to get only the magnitude of the voltage:
+
+Recall $|a-b|^{2} = (a-b)(a^{*}-b^{*})$:
+
+$$|\bar{V}_{i}|^{2} = (\bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1})~(\bar{V}^{*}_{i-1} - \bar{Z}^{*}_{i-1}~\bar{I}^{*}_{i-1})$$
+
+Multiplying both terms, we end up with:
+
+$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2~\Re \{\underbrace{\bar{V}^{*}_{i-1}~\bar{I}_{i-1}}_{\substack{\text{Apparent} \\ \text {Power} \\ \text{Conjugate}}}~\bar{Z}_{i-1}\} + |\bar{Z}_{i-1}|^{2}~|\bar{I}_{i-1}|^{2}$$ {#eq-voltage-ref1}
+
+Recall $\bar{S}^{*}_{i-1} = \bar{V}^{*}_{i-1}~\bar{I}_{i-1} = P_{i-1} - jQ_{i-1}$
+
+So the middle term can be decomposed such that:
+
+$$\bar{V}^{*}_{i-1}~\bar{I}_{i-1}~\bar{Z}_{i-1} = (P_{i-1} - jQ_{i-1})(r_{i-1}+jx_{i-1})$$
+
+Multiplying and obtaining only the real part because we are trying to calculate the magnitude:
+
+$$\Re \{\bar{Z}_{i-1}~\bar{V}^{*}_{i-1}~\bar{I}_{i-1}\} = r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1}$$ {#eq-voltage-ref2}
+
+The last term in @eq-voltage-ref1 can be simplified further. Recall that $|\bar{Z}_{i-1}|^{2} = r^{2}_{i-1} + x^{2}_{i-1}$ and $|\bar{I}_{i-1}|^{2} = \frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}}$
+
+$$|\bar{Z}_{i-1}|^{2}~|\bar{I}_{i-1}|^{2} = (r^{2}_{i-1} + x^{2}_{i-1})~(\frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}})$$ {#eq-voltage-ref3}
+
+Substituting @eq-voltage-ref2 and @eq-voltage-ref3 in @eq-voltage-ref1:
+
+$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+(r^{2}_{i-1} + x^{2}_{i-1})~\frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}}$$ {#eq-voltage-distflow}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-voltage-distflow is the Voltage Magnitude DistFlow Equation. This equation applies exactly to each branch under the paper's single-phase equivalent series-impedance model. It does not, by itself, describe mutual coupling in an unbalanced three-phase system.
+:::
+
+## Three-phase Unbalanced System
+
+Using the same KVL we used before, @eq-KVL2, we can set a system of equations for buses $i$ and $j$ such that $i$ is upstream of $j$:
+
+$$
+\begin{bmatrix}
+\bar{V}^{a}_{j} \\
+\bar{V}^{b}_{j} \\
+\bar{V}^{c}_{j}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i}
+\end{bmatrix}
+-
+\begin{bmatrix}
+\bar{Z}^{aa}_{ij} & \bar{Z}^{ab}_{ij} & \bar{Z}^{ac}_{ij}\\
+\bar{Z}^{ba}_{ij} & \bar{Z}^{bb}_{ij} & \bar{Z}^{bc}_{ij}\\
+\bar{Z}^{ca}_{ij} & \bar{Z}^{cb}_{ij} & \bar{Z}^{cc}_{ij}
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a}_{ij} \\
+\bar{I}^{b}_{ij} \\
+\bar{I}^{c}_{ij}
+\end{bmatrix}
+$$ {#eq-kvl-matrix-form}
+
+Note that the diagonal elements of $\bar{Z}_{ij}$ are self-impedances, and the off-diagonal elements are mutual impedances. This is a three-phase line model; a line with fewer phases uses the appropriate reduced impedance matrix. Neutral and transformer modeling must be handled consistently in the feeder model.
+
+For any given phase, the voltage equation can be extracted from the above matrix form. For instance:
+
+$$\bar{V}^{a}_{j} = \bar{V}^{a}_{i} - \bar{Z}^{aa}_{ij}\bar{I}^{a}_{ij} - \bar{Z}^{ab}_{ij}\bar{I}^{b}_{ij} - \bar{Z}^{ac}_{ij}\bar{I}^{c}_{ij}$$ {#eq-vv-eq-Unbalanced}
+
+We can rewrite the current terms in @eq-vv-eq-Unbalanced using complex power for each phase. At the sending end of line $(i,j)$:
+
+$$\bar{S}^{a}_{ij} = \bar{V}^{a}_{i}(\bar{I}^{a}_{ij})^{*} = P^{a}_{ij}+jQ^{a}_{ij}$$
+$$\bar{S}^{b}_{ij} = \bar{V}^{b}_{i}(\bar{I}^{b}_{ij})^{*} = P^{b}_{ij}+jQ^{b}_{ij}$$
+$$\bar{S}^{c}_{ij} = \bar{V}^{c}_{i}(\bar{I}^{c}_{ij})^{*} = P^{c}_{ij}+jQ^{c}_{ij}$$
+
+As a vector format, we can express the three complex power equations as:
+
+$$
+\begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i}(\bar{I}^{a}_{ij})^{*} \\
+\bar{V}^{b}_{i}(\bar{I}^{b}_{ij})^{*} \\
+\bar{V}^{c}_{i}(\bar{I}^{c}_{ij})^{*}
+\end{bmatrix}
+=
+\begin{bmatrix}
+P^{a}_{ij}+jQ^{a}_{ij} \\
+P^{b}_{ij}+jQ^{b}_{ij} \\
+P^{c}_{ij}+jQ^{c}_{ij}
+\end{bmatrix}
+$$ {#eq-three-phase-power-vector}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-three-phase-power-vector is a $3\times1$ vector of **per-phase complex powers**. It is not equal to a $3\times3$ matrix. The full branch-power matrix used by Gan and Low, including cross-phase products, is discussed in the background file. Mutual coupling is already present in @eq-kvl-matrix-form through the off-diagonal impedances.
+:::
+
+### Derive the current equations
+
+Consider the complex power for phase $a$ between two buses:
+
+$$\bar{S}_{ij}^{a} = \bar{V}_{i}^{a}(\bar{I}_{ij}^{a})^{*}$$
+
+Take the complex conjugate of both sides:
+
+$$\left(\bar{S}_{ij}^{a}\right)^{*} = (\bar{V}_{i}^{a})^{*}\bar{I}_{ij}^{a}$$
+
+Solving for $\bar{I}_{ij}^{a}$:
+
+$$\bar{I}_{ij}^{a} = \frac{\left(\bar{S}_{ij}^{a}\right)^{*}}{(\bar{V}_{i}^{a})^{*}}$$
+
+Which can be rewritten as:
+
+$$\bar{I}_{ij}^{a} = \frac{P_{ij}^{a} - jQ_{ij}^{a}}{(\bar{V}_{i}^{a})^{*}}$$ {#eq-phase-a-current}
+
+Solving for phases $b$ and $c$ using the same approach:
+
+$$\bar{I}_{ij}^{b} = \frac{P_{ij}^{b} - jQ_{ij}^{b}}{(\bar{V}_{i}^{b})^{*}}$$ {#eq-phase-b-current}
+
+$$\bar{I}_{ij}^{c} = \frac{P_{ij}^{c} - jQ_{ij}^{c}}{(\bar{V}_{i}^{c})^{*}}$$ {#eq-phase-c-current}
+
+@eq-phase-a-current, @eq-phase-b-current, and @eq-phase-c-current can be used in our KVL equation @eq-kvl-matrix-form, such that:
+
+$$
+\begin{bmatrix}
+\bar V_j^a \\
+\bar V_j^b \\
+\bar V_j^c
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar V_i^a \\
+\bar V_i^b \\
+\bar V_i^c
+\end{bmatrix}
+-
+\bar{Z}_{ij}
+\begin{bmatrix}
+\dfrac{P_{ij}^{a} - jQ_{ij}^{a}}{(\bar{V}_{i}^{a})^{*}} \\
+\dfrac{P_{ij}^{b} - jQ_{ij}^{b}}{(\bar{V}_{i}^{b})^{*}} \\
+\dfrac{P_{ij}^{c} - jQ_{ij}^{c}}{(\bar{V}_{i}^{c})^{*}}
+\end{bmatrix}
+$$ {#eq-KVL3}
+
+@eq-KVL3 expresses the receiving-end voltage phasors as a function of the sending-end voltage phasors, branch impedance, and phase real and reactive power flows [@gan2014convex]:
+
+$$\boxed{\mathbf{\bar V}_{j}=\mathbf f(\mathbf{\bar V}_{i},\mathbf{\bar Z}_{ij},\mathbf P_{ij},\mathbf Q_{ij})}$$
+
+::: {.callout-note appearance="simple"}
+## Note
+
+This is an **exact branch relationship**, not yet an explicit voltage-magnitude sensitivity to inverter reactive power injection. To connect an inverter at bus $k$ to voltages throughout the feeder, we must also use network current/power balance and the inverter injection convention. Gan and Low's squared-voltage matrix derivation is in the background file for reference.
+:::

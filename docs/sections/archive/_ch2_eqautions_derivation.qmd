@@ -1,0 +1,378 @@
+## Equations Derivation
+
+**NOTE: The paper uses DistFlow equations, which we are going to use in this work.**
+
+Consider the following single line diagram:
+
+::: {#fig-SLD layout-ncol="1"}
+![ht](/figures_qmd/Barans_paper_sld.png){width="80%"}
+
+A single Line Diagram (SLD) for an $n$ bus system. The loads are unknown for now. The Apparent Power ($\bar{S}$) flowing between each bus is shown.
+:::
+
+**For each load, we consider** $P_{L_{n}}$ and $Q_{L_{n}}$, indicating load power flow at each load.
+
+Each line has an impedance, $Z_{n} = r_{n}+jx_{n}$. The apparent power flow at each line is given by:
+
+$$\bar{S_{n}} = P_{n}+jQ_{n}$$
+
+For instance, at bus $i+1:$ $$\bar{S}_{i+1} = P_{i+1}+jQ_{i+1}$$
+
+## Deriving the Real and Reactive Power Equations
+
+I think it is easier to see this if we look at the power flow between two buses. Consider the power flow between buses 0 & $i-1$:
+
+$$\underbrace{\bar{P}_{0}}_{\text{Power leaving bus $0$}} = \underbrace{\bar{P}_{0, loss}}_{\text{Losses}} + \underbrace{\bar{P}_{i-1}}_{\text{Power entering bus $i-1$}} +\underbrace{\bar{P}_{i-1, load}}_{\text{Power consumed by bus $i-1$ load}}$$ {#eq-KCL}
+
+### Decomposing the Losses term in equation @eq-KCL
+
+$$P_{losses} = r |I^{2}|$$
+
+At any given bus $n$:
+
+$$P_{n,losses} = r_{n} |I^{2}_{n}|$$ {#eq-power_losses}
+
+Recall:
+
+$$\bar{S} = \bar{I}^{*} \bar{V} = \bar{P}+j\bar{Q}$$
+
+Wherein the magnitude of the apparent power is given by:
+
+$$|S| = |I|~|V| = \sqrt{P^{2} + Q^{2}}$$
+
+Squaring both sides:
+
+$$|S|^{2} = |I|^{2}~|V|^{2} = P^{2}+Q^{2}$$
+
+Solving for the current, $I$:
+
+$$|I|^{2} = \frac{P^{2} + Q^{2}}{|V|^{2}}$$
+
+At any given bus $n$, the current is:
+
+$$|I_{n}|^{2} = \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}$$ {#eq-current}
+
+substituting the current equation @eq-current into @eq-power_losses we get:
+
+$$P_{n,losses} = r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}$$ {#eq-full-Plosses}
+
+Subtituting @eq-full-Plosses in the KCL between buses $0$ and $i-1$ in @eq-KCL, we get:
+
+$$\underbrace{\bar{P}_{n}}_{\text{Power leaving bus $n$}} = \underbrace{r_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}}_{\text{Losses}} + \underbrace{\bar{P}_{n+1}}_{\text{Power entering bus $n+1$}} +\underbrace{\bar{P}_{n+1, load}}_{\text{Power consumed by bus $n+1$ load}}$$ {#eq-DistFlow-Real-Power-Equation}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-DistFlow-Real-Power-Equation is the real power DistFlow Equation. This equation can be used for any power flow calculations.
+:::
+
+Similarly, the reactive power can be calculated in a similar manner:
+
+$$\underbrace{\bar{Q}_{n}}_{\text{Q leaving bus $n$}} = \underbrace{x_{n} \frac{P^{2}_{n} + Q^{2}_{n}}{|V_{n}|^{2}}}_{\text{Losses}} + \underbrace{\bar{Q}_{n+1}}_{\text{Q entering bus $n+1$}} +\underbrace{\bar{Q}_{n+1, load}}_{\text{Q consumed by bus $n+1$ load}}$$ {#eq-DistFlow-Reactive-Power-Equation}
+
+## Deriving the Voltage Equation:
+
+Applying KVL to buses, $i$ and $i-1$ in @fig-SLD:
+
+$$\bar{V}_{i-1} = \bar{Z}_{i-1}~\bar{I}_{i-1} + \bar{V}_{i}$$ {#eq-KVL}
+
+The current complex value can be solved for in a similar manner as in equation @eq-current:
+
+$$\bar{V}_{n}~\bar{I}_{n}^{*} = \bar{P}_{n}+{j\bar{Q}}_{n}$$
+
+Solving for $\bar{I}_{n}^{*}$:
+
+$$\bar{I}_{n} = \frac{\bar{P}_{n}-j\bar{Q}_{n}}{\bar{V}_{n}^{*}}$$ {#eq-complex-current}
+
+Subtituting @eq-complex-current in @eq-KVL & solving for $\bar{V}_{i}$:
+
+$$\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1}$$ {#eq-KVL2}
+
+$$\bar{V}_{i} = \bar{V}_{i-1} - \bar{Z}_{i-1}~\frac{\bar{P}_{i-1}-j\bar{Q}_{i-1}}{\bar{V}_{i-1}^{*}}$$
+
+We can then extend this to get only the magnitude of the voltage:
+
+Recall $|a^{2} - b^{2}| = (a-b)(a^{*} - b^{*})$:
+
+$$|V^{2}_{i}| = (\bar{V}_{i-1} - \bar{Z}_{i-1}~\bar{I}_{i-1})~(\bar{V}^{*}_{i-1} - \bar{Z}^{*}_{i-1}~\bar{I}^{*}_{i-1})$$
+
+Multiplying both terms, we end up with:
+
+$$|V^{2}_{i}| = |V^{2}_{i-1}| - 2~\Re \{\underbrace{\bar{V}^{*}_{i-1}~\bar{I}_{i-1}}_{\substack{\text{Apparent} \\ \text {Power} \\ \text{Conjugate}}}~\bar{Z}_{i-1}\} + |Z^{2}_{i-1}|~|I^{2}_{i-1}|$$ {#eq-voltage-ref1}
+
+Recall $\bar{S}^{*}_{i-1} = \bar{V}^{*}_{i-1}~\bar{I}_{i-1} = \bar{P}_{i-1} - j\bar{Q}_{i-1}$
+
+So the middle term can be decomposed such that:
+
+$$\bar{V}^{*}_{i-1}~\bar{I}_{i-1}~\bar{Z}_{i-1} = (\bar{P}_{i-1} - j\bar{Q}_{i-1})(r_{i-1}+jx_{i-1})$$
+
+Multiplying and obtaining only the real part because we are trying to calculate the magnitude:
+
+$$\Re \{\bar{Z}_{i-1}~\bar{V}^{*}_{i-1}~\bar{I}_{i-1}\} = r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1}$$ {#eq-voltage-ref2}
+
+The last term in @eq-voltage-ref1 can be simplified further. Recall that $|Z^{2}_{i-1}| = r^{2}_{i-1} + x^{2}_{i-1}$ and $|I^{2}_{i-1}| = \frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}^{2}|}$
+
+$$|Z^{2}_{i-1}|~|I^{2}_{i-1}| = (r^{2}_{i-1} + x^{2}_{i-1})~(\frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}^{2}|})$$ {#eq-voltage-ref3}
+
+Subtituting @eq-voltage-ref2 and @eq-voltage-ref3 in @eq-voltage-ref1:
+
+$$|V^{2}_{i}| = |V^{2}_{i-1}| - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+(r^{2}_{i-1} + x^{2}_{i-1})~\frac{P^{2}_{i-1}-Q^{2}_{i-1}}{|V_{i-1}|^{2}}$$ {#eq-voltage-distflow}
+
+::: {.callout-note appearance="simple"}
+## Note
+
+@eq-voltage-distflow is the Voltage Magnitude DistFlow Equation. This equation can be used for any $n-bus$ power system.
+:::
+
+## Three-phase Unbalanced System
+
+Using the same KVL we used before, @eq-KVL2, we can set a system of equations for buses $i$ and $j$ such that:
+
+$$
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i}
+\end{bmatrix} 
+=
+\begin{bmatrix}
+\bar{V}^{a}_{j} \\
+\bar{V}^{b}_{j} \\
+\bar{V}^{c}_{j}
+\end{bmatrix}
+-
+\begin{bmatrix}
+\bar{Z}^{aa}_{ij} & \bar{Z}^{ab}_{ij} & \bar{Z}^{ac}_{ij}\\
+\bar{Z}^{ba}_{ij} & \bar{Z}^{ab}_{ij} & \bar{Z}^{bc}_{ij}\\
+\bar{Z}^{ca}_{ij} & \bar{Z}^{cb}_{ij} & \bar{Z}^{cc}_{ij}
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a}_{ij} \\
+\bar{I}^{b}_{ij} \\
+\bar{I}^{c}_{ij}
+\end{bmatrix}
+$${#eq-kvl-matrix-form}
+
+For any given bus, the voltage equation can extracted from the above matrix form. For instance:
+
+$$\bar{V}^{a}_{i} = \bar{V}^{a}_{j} - \bar{Z}_{aa}~\bar{I}^{a}_{ij} - \bar{Z}_{ab}~\bar{I}^{b}_{ij} - \bar{Z}_{ac}~\bar{I}^{c}_{ij}$$ {#eq-vv-eq-Unbalanced}
+
+We can rewrite the above equation, @eq-vv-eq-Unbalanced, in apparent power for each phase. For instance, 
+$$\bar{S}^{a}\ =\bar{V}^{a}(\bar{I}^{a})^{*} = P^{a} + jQ^{a}$$
+$$\bar{S}^{b}\ =\bar{V}^{b}(\bar{I}^{b})^{*} = P^{b} + jQ^{b}$$
+$$\bar{S}^{c}\ =\bar{V}^{c}(\bar{I}^{c})^{*} = P^{c} + jQ^{c}$$
+
+As a vector format, we can express the three apparent power equations in a matrix form:
+$$\bar{S} = \begin{bmatrix}
+\bar{S}^{a} \\
+\bar{S}^{b} \\
+\bar{S}^{c}
+\end{bmatrix}
+=
+\begin{bmatrix}
+P^{a} + jQ^{a} \\
+P^{b} + jQ^{b} \\
+P^{c} + jQ^{c}
+\end{bmatrix}
+$$
+
+Rewrite these in terms of buses $i$ and $j$:
+
+$$\bar{S} = \begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+P^{a}_{ij} + jQ^{a}_{ij} \\
+P^{b}_{ij} + jQ^{b}_{ij} \\
+P^{c}_{ij} + jQ^{c}_{ij}
+\end{bmatrix}
+$$
+
+Recall that $\bar{S}_{ij} = \bar{V}_{i} \bar{I}^{*}_{ij} = P_{ij} + jQ_{ij}$. Considering the $\bar{S}_{ij} = \bar{V}_{i} \bar{I}^{*}_{ij}$ part:
+
+$$\begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i} \\
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a(*)}_{ij} \\
+\bar{I}^{b(*)}_{ij} \\
+\bar{I}^{c(*)}_{ij} \\
+\end{bmatrix}
+$$
+
+Note that the current and voltage matrices are $3 \times 1$, which we cannot perform a regular matrix multiplication on. A dot product results in a single number, and our goal is to get a 3x3 matrix. Therefore, we can transpose the current (or voltage) matrix. Hence:
+
+$$\begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i} \\
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a(*)}_{ij} \\
+\bar{I}^{b(*)}_{ij} \\
+\bar{I}^{c(*)}_{ij} \\
+\end{bmatrix}^{\top}
+$$
+
+which can be rewritten as:
+
+$$\begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i} \\
+\bar{V}^{b}_{i} \\
+\bar{V}^{c}_{i} \\
+\end{bmatrix}
+\begin{bmatrix}
+\bar{I}^{a(*)}_{ij} & \bar{I}^{b(*)}_{ij} & \bar{I}^{c(*)}_{ij}
+\end{bmatrix}
+$$
+
+Resulting in:
+
+$$\begin{bmatrix}
+\bar{S}^{a}_{ij} \\
+\bar{S}^{b}_{ij} \\
+\bar{S}^{c}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\bar{V}^{a}_{i} \bar{I}^{a(*)}_{ij} & \bar{V}^{a}_{i} \bar{I}^{b(*)}_{ij} & \bar{V}^{a}_{i} \bar{I}^{c(*)}_{ij} \\
+\bar{V}^{b}_{i} \bar{I}^{a(*)}_{ij} & \bar{V}^{b}_{i} \bar{I}^{b(*)}_{ij} & \bar{V}^{b}_{i} \bar{I}^{c(*)}_{ij} \\
+\bar{V}^{c}_{i} \bar{I}^{a(*)}_{ij} & \bar{V}^{c}_{i} \bar{I}^{b(*)}_{ij} & \bar{V}^{c}_{i} \bar{I}^{c(*)}_{ij}
+\end{bmatrix}
+=
+\begin{bmatrix}
+P^{a}_{ij} + jQ^{a}_{ij} \\
+P^{b}_{ij} + jQ^{b}_{ij} \\
+P^{c}_{ij} + jQ^{c}_{ij}
+\end{bmatrix}
+$$
+
+Note that the diagonal elements in the above equation are branch power flow ($ij$), indicating multiple branches connected to a single bus/node. We can extract any phase from the above equation, such that:
+
+$$\bar{S}^{a}_{ij} = \bar{V}^{a}_{i} [\bar{I}^{a(*)}_{ij}+\bar{I}^{b(*)}_{ij}+\bar{I}^{c(*)}_{ij}] = P^{a}_{ij} + jQ^{a}_{ij}$$
+
+### Derive the current equations
+
+Consider the apparent power for two buses:
+
+$$\bar{S}_{ij}^{a} = \bar{V}_{i}^{a} \bar{I}_{ij}^{a(*)}$$
+
+Take the complex conjugate of both sides:
+
+$$\bar{S}_{ij}^{a(*)} = \bar{V}_{i}^{a(*)} \bar{I}_{ij}^{a}$$
+
+solving for $\bar{I}_{ij}^{a}$:
+
+$$\bar{I}_{ij}^{a} = \frac{\bar{S}_{ij}^{a(*)}}{\bar{V}_{i}^{a(*)}}$$
+
+which can be rewritten as:
+
+$$\bar{I}_{ij}^{a} = \frac{P_{ij}^{a} - jQ_{ij}^{a}}{\bar{V}_{i}^{a(*)}}$${#eq-phase-a-current}
+
+Solving for phase $b$ and $c$ using the same approach:
+
+$$\bar{I}_{ij}^{b} = \frac{P_{ij}^{b} - jQ_{ij}^{b}}{\bar{V}_{i}^{b(*)}}$${#eq-phase-b-current}
+
+$$\bar{I}_{ij}^{c} = \frac{P_{ij}^{c} - jQ_{ij}^{c}}{\bar{V}_{i}^{c(*)}}$${#eq-phase-c-current}
+
+@eq-phase-a-current, @eq-phase-b-current, and @eq-phase-c-current can be used in our @eq-KVL2, such that:
+
+$$\bar{V}_{j} = \bar{V}_{i} - \bar{Z}_{ij}
+\begin{bmatrix}
+\frac{P_{ij}^{a} - jQ_{ij}^{a}}{\bar{V}_{i}^{a(*)}} \\
+\frac{P_{ij}^{b} - jQ_{ij}^{b}}{\bar{V}_{i}^{b(*)}} \\
+\frac{P_{ij}^{c} - jQ_{ij}^{c}}{\bar{V}_{i}^{c(*)}}
+\end{bmatrix}
+$${#eq-KVL3}
+
+@eq-KVL3 expresses the voltage as a function of line impedance [@gan2014convex], current, Real, and Reactive power:
+$$\mathbf{\bar{V}} = \mathbf{f}(\mathbf{\bar{Z}}, \mathbf{\bar{I}}, \mathbf{\bar{P}}, \mathbf{\bar{Q}})$$
+
+### Derive the magnitude of the Voltage
+
+Following the same approach as we did in @eq-KVL, and considering the voltage and current vectors in @eq-kvl-matrix-form, we can derive the magnitude of the voltage. Recall that $\bar{V}_{j} = \bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij}$. To get the magnitude of the voltage, we multiply both side by their complex conjugates:
+
+$$\bar{V}_{j}\bar{V}_{j}^{*} = (\bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij})(\bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij})^{*}$$
+
+Note that:
+
+$$\underbrace{\bar{V}_{j}}_{\text{1$\times$3}}~\underbrace{\bar{V}_{j}^{*}}_{\text{1 $\times$ 3}} = (\bar{V_{i}} - \bar{Z}_{ij}~\bar{I}_{ij})(\bar{V_{i}} - \bar{Z}_{ij}~\bar{I}_{ij})^{*}$$
+
+We cannot perform a matrix multiplication because of the matrix dimensions. Because we are working with vectors, we use the conjugate transpose.
+
+$$\underbrace{\bar{V}_{j}}_{\text{1$\times$3}}~\underbrace{\bar{V}_{j}^{\mathbf{H}}}_{\text{3 $\times$ 1}} = (\bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij})(\bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij})^{\mathbf{H}}$$ {#eq-kvl-complex-form-v-magnitude}
+
+See the following to understand how we approach this.
+#### Solving for the right hand side of @eq-kvl-complex-form-v-magnitude
+
+Remember that the right hand side voltages in @eq-kvl-complex-form-v-magnitude are both matrices. So transposing oen of the voltage quantities would allow us to solve the magnitude of the voltage.
+
+$$\bar{V}_{j}\bar{V}_{j}^{*\top} = \begin{bmatrix}
+\bar{V}_{j}^{a} \\
+\bar{V}_{j}^{b} \\
+\bar{V}_{j}^{c}
+\end{bmatrix}_{1 \times 3}
+\begin{bmatrix}
+\bar{V}_{j}^{a*} & \bar{V}_{j}^{b*} & \bar{V}_{j}^{c*}
+\end{bmatrix}_{3 \times 1} =
+\begin{bmatrix}
+|\bar{V}_{j}^{a}|^{2} & \bar{V}_{j}^{a} \bar{V}_{j}^{b*} & \bar{V}_{j}^{a} \bar{V}_{j}^{c*} \\
+\bar{V}_{j}^{b} \bar{V}_{j}^{a*} & |\bar{V}_{j}^{b}|^{2} & \bar{V}_{j}^{b} \bar{V}_{j}^{c*} \\
+\bar{V}_{j}^{c} \bar{V}_{j}^{a*} & \bar{V}_{j}^{c} \bar{V}_{j}^{b*} & |\bar{V}_{j}^{c}|^{2}
+\end{bmatrix}_{3 \times 3}
+$${#eq-voltage-matrix-magnitude}
+
+Note that the diagonal elements are the voltage magnitudes; the off-diagonal elements are still the complex numbers. So @eq-voltage-matrix-magnitude works for bus $j$. Similarly, we can use @eq-voltage-matrix-magnitude for any bus $i$. Therefore, [@gan2014convex] defines the magnitude of the voltage matrix as:
+$$\bar{W}_{j} = \bar{V}_{j} \bar{V}_{j}^{\mathbf{H}}$${#eq-voltage-wj}
+
+The process of taking the conjugate transpose of a matrix is known as the **Hermitian Transpose ($\mathbf{H}$)**. Note that $\mathbf{H}$ corresponds to all of the diagonal elements in the voltage matrix. Similarly, for any bus $i$, the voltage magnitude can be defined as:
+$$\bar{W}_{i} = \bar{V}_{i} \bar{V}_{i}^{\mathbf{H}}$${#eq-voltage-wi}
+
+#### Solving the right hand side of @eq-kvl-complex-form-v-magnitude
+
+We can apply the same Hermitian Transpose to the right side of @eq-kvl-complex-form-v-magnitude. 
+$$\underbrace{\bar{V}_{j}\bar{V}_{j}^{\mathbf{H}}}_{\text{3$\times$3}} = (\bar{V_{i}} - \bar{Z}_{ij}~\bar{I}_{ij})(\bar{V_{i}} - \bar{Z}_{ij}\bar{I}_{ij})^{\mathbf{H}}$$
+
+Decompose the **Hermitian Transpose** of the right hand side:
+
+$$\underbrace{\bar{V}_{j}\bar{V}_{j}^{\mathbf{H}}}_{\text{3$\times$3}} = (\bar{V_{i}} - \bar{Z}_{ij}~\bar{I}_{ij})(\bar{V_{i}}^{\mathbf{H}} - \underbrace{\bar{I}_{ij}^{\mathbf{H}}~\bar{Z}_{ij}^{\mathbf{H}}}_{\text{See Voltage Eq. Note}})$$
+
+::: {.callout-note appearance="simple"}
+## Voltage Eq. Note
+$(\underbrace{\bar{Z}}_{3\times3}~\underbrace{\bar{I}}_{3\times1})^{\mathbf{H}} = \underbrace{\bar{I}^{\mathbf{H}}}_{1\times3}~\underbrace{\bar{Z}^{\mathbf{H}}}_{3\times3}$
+
+Note that the vectors multiplication order is reversed when taking the conjugate transpose. The reason is that the inner dimensions of the $Z$ and $I$ matrices do not match! However, if we reverse the order (as shown in the right hand side), the inner dimensions match.
+:::
+
+Expanding the right hand side:
+
+$$\underbrace{\bar{V}_{j}\bar{V}_{j}^{\mathbf{H}}}_{\text{3$\times$3}} = \underbrace{\bar{V}_{i}\bar{V}_{i}^{\mathbf{H}}}_{\text{3$\times$3}} - \bar{V}_{i} \bar{I}_{ij}^{\mathbf{H}} \bar{Z}_{ij}^{\mathbf{H}} - \bar{I}_{ij} \bar{Z}_{ij} \bar{V}_{i}^{\mathbf{H}} + \bar{Z}_{ij}\bar{I}_{ij}\bar{I}_{ij}^{\mathbf{H}}\bar{Z}_{ij}^{\mathbf{H}}$${#eq-voltage-three-phase-kvl-matrix}
+
+We previously defined the voltage matrix at bus $i$ in @eq-voltage-wi and the branch power was defined as $\bar{S}_{ij} = \bar{V}_{i}\bar{I}_{ij}^{\mathbf{H}}$. Accordingly, here we can define the current matrix as:
+$$\bar{L}_{ij} = \bar{I}_{ij}\bar{I}_{ij}^{\mathbf{H}}$$ Therefore, @eq-voltage-three-phase-kvl-matrix can be written as:
+
+$$\bar{W}_{j} = \bar{W}_{i} - \bar{S}_{ij}\bar{Z}_{ij}^{\mathbf{H}} - \bar{Z}_{ij}\bar{S}_{ij}^{\mathbf{H}} + \bar{Z}_{ij} \bar{L}_{ij}\bar{Z}_{ij}^{\mathbf{H}}$$
+

@@ -1,0 +1,9 @@
+## Introduction
+
+In this document, I review two papers. The first papers introduces the derivation is for three-phase, balanced systems. The second derviation is for three-phase unbalanced systems.
+
+## First Paper: Network Reconfiguration in Distribution Systems for Loss Reduction and Demand Balancing, Baran et. al.
+
+## Paper's Objectives
+
+1- How can we change the network configuration to reduce resistive losses? 2- How can the load be distributed such that no overloads occur on the T-Lines?
