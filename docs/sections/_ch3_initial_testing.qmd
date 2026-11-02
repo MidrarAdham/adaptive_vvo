@@ -59,3 +59,4 @@ The question that we try to answer in this section is:
 
 - Can an inverter at say, house 15, raise its voltage from (e.g., 0.92) up toward a target value (1.0 p.u.)?
 
+![Inverter Operation at House 15](../figures_qmd/house15_bess_control.svg){#fig-inverter-Q}
