@@ -1,3 +1,7 @@
 voltage_management.md
 references/
 *.py
+*.csv
+*.log
+*.png
+*.svg

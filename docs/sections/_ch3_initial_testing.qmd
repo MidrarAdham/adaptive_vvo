@@ -1,1 +1,61 @@
-## Introduction
+## Goal
+We are trying to answer the following questions in this experiment:
+- Can an inverter at say, house 15, raise its voltage from (e.g., 0.92) up toward a target value (1.0 p.u.)?
+- If house 15 injects Q, how much do the voltages at the rest of the houses change?
+- How much reactive power is necessary to achieve a particular household voltage target? Is this amount within the inverter capability?
+
+## Setup
+The GridLAB-D file is set to 15 houses, with a single substation transformer and distribution transformer. There are two nodes: upstream node and node 4. The upstream node is a swing bus node. Node 4 is the main node wherein all the loads connect to. 
+
+### Initial Case
+None of the houses have inverters in them. The voltagge behavior is depicted at each house, as well as the source node.
+
+![The voltage at each house, with a total of 15 houses. The first figure shows the voltage at Node 4, which is not a Swing node (obviously!)](../figures_qmd/basecase_voltages.svg)
+
+Note that the voltage drops as the house is at a further distance from node 4. 
+
+### Sweep the voltage at Node 4
+
+When the voltage is swept at Node 4, the same voltage drop is depicted at different houses location.
+
+![Voltage Sweeping Across Node4](../figures_qmd/node4_sweep.svg){#fig-sweeping-voltage}
+
+
+```{python}
+#| echo: false
+#| label: tbl-csv-data
+#| tbl-cap: "Simulation Results Data"
+
+import pandas as pd
+from IPython.display import Markdown
+
+# Load the CSV file
+df = pd.read_csv("/home/midrar/projects/adaptive_vvo/gld/results/node4_sweep/summary.csv")
+
+df = df.head (10)
+
+# Convert the dataframe directly into a clean markdown table
+Markdown(df.to_markdown(index=False))
+```
+@fig-sweeping-voltage demonstrates that the household voltage response depends on both the upstream voltage and the household's location along the feeder. Note that the distance of voltage lines in @fig-sweeping-voltage decreases consecutively. The current flow in the line supplying house 1 carries the combined current of many downstream loads. The line between house 1 and house 2 carries slightly less current, and so forth. From ohm's law:
+
+$$\Delta \bar{\mathbf{V}} = \bar{\mathbf{Z}}\bar{\mathbf{I}}$$
+
+If the line segments approximately equal impedances, the voltage drop across each segment generally decreases as we move downstream because the current decreases. Therefore:
+
+$$|\Delta \bar{\mathbf{V}}_{1,2}| > |\Delta \bar{\mathbf{V}}_{13,14}| > |\Delta \bar{\mathbf{V}}_{14,15}|$$
+
+To explain this further, let's look at all households at their lowest point, which is at 8:46 p.m.
+
+![Voltage Sweep at 8:46 p.m. of all houses](../figures_qmd/node4_sweep_common_timestamp.svg){#fig-sweeping-voltage-common}
+
+The voltage behavior, as shown in @fig-sweeping-voltage-common, is clearly nonlinear. And, the voltage drop distance between households decreases as we go down the node. This explains that the voltage trend is associated with the line impedance as well as the feeder loading, rather than a particular source voltage. This behavior is explain by:
+
+$$\Delta \bar{\mathbf{V}} \approx \frac{RP+XQ}{\bar{\mathbf{V}}}$$
+
+### Answering the first question
+
+The question that we try to answer in this section is:
+
+- Can an inverter at say, house 15, raise its voltage from (e.g., 0.92) up toward a target value (1.0 p.u.)?
+
