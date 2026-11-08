@@ -1,0 +1,75 @@
+## Motivation
+
+Distribution voltage is conventionally held near nominal along the primary feeder, typically within ±5%, so that every customer receives a service voltage inside ANSI C84.1 Range A (114–126 V). The limit, however, applies at the customer service point, not on the primary. If residential inverters can correct the voltage locally at each household, the primary feeder voltage no longer has to be chosen to protect the worst-placed customer. It becomes a decision variable: it can be lowered for conservation voltage reduction (CVR) or raised to reduce losses, while inverters hold each household within its service limit.
+
+## State of the Art
+
+- **CVR with smart inverters.** Smart inverters have been coordinated with tap changers, regulators and capacitors to achieve CVR on three-phase unbalanced feeders [@jha2019bilevel; @zhang2019distributed], including integrated primary-secondary networks with voltage-dependent loads [@zhang2021primarysecondary]. In these studies inverters *support* CVR, while the primary voltage stays within its conventional band.
+- **Grid-edge voltage control.** Dedicated utility-owned devices on the secondary side of service transformers regulate customer voltage so that the primary can be lowered further. Field deployments report up to 5% CVR [@moghe2016gridedge], limiting-node voltage increases of 0.88–2.04% [@jha2023gridedge], and energy savings up to 4.7% when combined with smart inverters [@padullaparti2023cvr].
+- **Volt-VAR curve design.** Per-inverter Volt-VAR rules have been optimized for single-phase feeders [@murzakhanov2024optimal], unbalanced multiphase feeders [@gupta2025regulating], and a single utility-scale battery [@ingebrigtsen2026optimizing]. All aim to keep voltages near nominal rather than to compensate a deliberately shifted primary.
+- **Cross-phase coupling.** On unbalanced four-wire networks, reactive power injected on one phase changes the voltages on the other phases [@wang2020interphase; @dalal2024crossphase].
+- **Siting and sizing.** Methods exist to choose how many voltage-support units are needed and where, but for balanced networks [@giannitrapani2017optimal] or PV at medium voltage [@chen2022optimal].
+
+## Research Gap
+
+Existing work either regulates customer voltage at the grid edge with dedicated utility devices, or uses residential inverters as auxiliary support while the primary voltage remains within its conventional band. No study has treated the primary feeder voltage as a free decision variable whose feasible range is set by the corrective capability of customer-owned residential inverters.
+
+In particular, it is not known:
+
+1. how far the primary voltage can be shifted, up or down, before participating inverters can no longer hold every household within its service-voltage limit;
+2. how this range depends on the number, location and phase of participating inverters, and how it is reduced by cross-phase coupling, non-participating customers and battery operating state on unbalanced feeders;
+3. whether the energy saved by operating the primary away from nominal outweighs the additional losses caused by the reactive power needed to compensate it; and
+4. whether the required compensation can be delivered autonomously through location-dependent Volt-VAR settings.
+
+We define the **decoupling range** as the set of primary-side voltage set-points for which the participating inverters can keep every household service voltage within its target limits.
+
+## Research Goal
+
+To develop and evaluate a methodology for inverter-enabled grid-edge voltage regulation, in which residential inverters compensate their local service voltage so that the primary feeder voltage can be decoupled from customer voltage limits on unbalanced distribution networks.
+
+## Research Objectives
+
+- **O1 — Quantify the decoupling range.** Develop a sensitivity-based model that determines the decoupling range as a function of inverter count, location, phase assignment and rating.
+- **O2 — Identify the limiting factors.** Characterize how cross-phase coupling, non-participating customers and battery operating state (charging, discharging, idle) narrow or extend the decoupling range.
+- **O3 — Evaluate the net benefit.** Determine the primary voltage set-point that maximizes net benefit across loading conditions, accounting for voltage-dependent load reduction, additional network losses, transformer loading and substation power factor.
+- **O4 — Enable decentralized implementation.** Translate the required reactive power into location-dependent Volt-VAR settings (reference voltage, deadband, slope and reactive limits). Identify when autonomous operation is sufficient and when coordination is needed.
+
+## Research Questions
+
+**RQ1 — Decoupling feasibility:** For a given set of residential inverters, what range of primary voltage set-points can be supported while keeping every household within its target service voltage, and how does this range scale with inverter count, location, phase assignment and rating?
+
+**RQ2 — Limiting factors:** How do cross-phase coupling, non-participating customers and battery operating state constrain the decoupling range on unbalanced feeders?
+
+**RQ3 — Net benefit:** Within the feasible range, which primary voltage set-point maximizes net energy benefit, after netting voltage-dependent load reduction against additional losses, and how does this optimum change with loading?
+
+**RQ4 — Decentralized implementation:** Can the reactive power required at each location be encoded in Volt-VAR curves that hold household voltages at their targets without communication, and under what conditions does coordination become necessary?
+
+## Scope and Assumptions
+
+- Unbalanced three-phase feeders with service transformers and single-phase residential connections. *To decide: test feeder (e.g., IEEE 8500-node or a PNNL taxonomy feeder) and whether secondaries are modelled as split-phase.*
+- Customer-owned single-phase residential inverters (PV and battery) with reactive capability limited by IEEE 1547-2018.
+- Voltage-dependent load models (ZIP or CVR factor), since CVR savings depend directly on them.
+- Quasi-static time-series simulation over representative loading conditions.
+
+## Expected Contributions
+
+1. The concept and quantification of a **decoupling range** for inverter-enabled grid-edge voltage regulation, and its dependence on inverter participation, location and phase.
+2. An analysis of how **cross-phase coupling and battery operating state** limit grid-edge compensation on unbalanced feeders.
+3. A **net-benefit assessment** identifying when shifting the primary voltage is worthwhile once added losses are included.
+4. A method for deriving **location-dependent Volt-VAR settings** that implement the approach autonomously. Volt-VAR curves are the implementation of the methodology, not its primary objective.
+
+## References
+
+- jha2019bilevel — Jha, Dubey et al., "Bi-Level Volt-VAR Optimization to Coordinate Smart Inverters With Voltage Control Devices," IEEE Trans. Power Syst., 2019. doi:10.1109/tpwrs.2018.2890613
+- zhang2019distributed — Zhang, Dehghanpour and Wang, "Distributed CVR in Unbalanced Distribution Systems With PV Penetration," IEEE Trans. Smart Grid, 2019. doi:10.1109/tsg.2018.2880419
+- zhang2021primarysecondary — Zhang, Guo et al., "Distributed Optimal Conservation Voltage Reduction in Integrated Primary-Secondary Distribution Systems," IEEE Trans. Smart Grid, 2021. doi:10.1109/tsg.2021.3088010
+- moghe2016gridedge — Moghe, Tholomier et al., "Grid Edge Control: A new approach for volt-var optimization," IEEE PES T&D, 2016. doi:10.1109/tdc.2016.7519895
+- jha2023gridedge — Jha, Fan et al., "Enhancing Conservation Voltage Reduction with Grid Edge Volt-VAr Control," IEEE Grid Edge, 2023. doi:10.1109/gridedge54130.2023.10102726
+- padullaparti2023cvr — Padullaparti, Baggu et al., "Conservation Voltage Reduction with Distributed Energy Resource Management System, Grid-Edge, and Legacy Devices," IEEE PESGM, 2023. doi:10.1109/pesgm52003.2023.10252669
+- murzakhanov2024optimal — Murzakhanov, Gupta, Chatzivasileiadis and Kekatos, "Optimal Design of Volt/VAR Control Rules for Inverter-Interfaced Distributed Energy Resources," IEEE Trans. Smart Grid, 2024. doi:10.1109/TSG.2023.3279982
+- gupta2025regulating — Gupta et al., "Regulating Voltage Magnitude and Phase Imbalance using DERs via Volt/VAR Control Rules," IEEE PowerTech, 2025. *(DOI to confirm)*
+- ingebrigtsen2026optimizing — Ingebrigtsen, Bordin, Chiesa and Bakkejord, "Optimizing and implementing Volt-Var control in battery storage systems for voltage regulation in remote distribution networks," Discover Applied Sciences, 2026. doi:10.1007/s42452-025-08069-9
+- wang2020interphase — Wang et al., "A Distributed Inter-Phase Coordination Algorithm for Voltage Control With Unbalanced PV Integration in LV Systems," IEEE Trans. Sustain. Energy, 2020. doi:10.1109/tste.2020.2970214
+- dalal2024crossphase — Dalal et al., "Analyzing Cross-Phase Effects of Reactive Power Intervention on Distribution Voltage Control," IEEE PESGM, 2024. *(DOI to confirm)*
+- giannitrapani2017optimal — Giannitrapani, Paoletti, Vicino and Zarrilli, "Optimal Allocation of Energy Storage Systems for Voltage Control in LV Distribution Networks," IEEE Trans. Smart Grid, 2017. doi:10.1109/TSG.2016.2602480
+- chen2022optimal — Chen et al., "Optimal Placement of PV Smart Inverters With Volt-VAr Control," IEEE Systems Journal, 2022. *(DOI to confirm)*

@@ -1,0 +1,606 @@
+## Setup
+The GridLAB-D file is set to 15 houses, with a single substation transformer and distribution transformer. There are two nodes: upstream node and node 4. The upstream node is a swing bus node. Node 4 is the main node wherein all the loads connect to. 
+
+### Initial Case
+None of the houses have inverters in them. The voltagge behavior is depicted at each house, as well as the source node.
+
+![The voltage at each house, with a total of 15 houses. The first figure shows the voltage at Node 4, which is not a Swing node (obviously!)](../figures_qmd/basecase_voltages.svg)
+
+Note that the voltage drops as the house is at a further distance from node 4. 
+
+### Sweep the voltage at Node 4
+
+When the voltage is swept at Node 4, the same voltage drop is depicted at different houses location.
+
+![Voltage Sweeping Across Node4](../figures_qmd/node4_sweep.svg){#fig-sweeping-voltage}
+
+
+```{python}
+#| echo: false
+#| label: tbl-csv-data
+#| tbl-cap: "Simulation Results Data"
+
+import pandas as pd
+from IPython.display import Markdown
+
+# Load the CSV file
+df = pd.read_csv("/home/midrar/projects/adaptive_vvo/gld/results/node4_sweep/summary.csv")
+
+df = df.head (10)
+
+# Convert the dataframe directly into a clean markdown table
+Markdown(df.to_markdown(index=False))
+```
+@fig-sweeping-voltage demonstrates that the household voltage response depends on both the upstream voltage and the household's location along the feeder. Note that the distance of voltage lines in @fig-sweeping-voltage decreases consecutively. The current flow in the line supplying house 1 carries the combined current of many downstream loads. The line between house 1 and house 2 carries slightly less current, and so forth. From ohm's law:
+
+$$\Delta \bar{\mathbf{V}} = \bar{\mathbf{Z}}\bar{\mathbf{I}}$$
+
+If the line segments approximately equal impedances, the voltage drop across each segment generally decreases as we move downstream because the current decreases. Therefore:
+
+$$|\Delta \bar{\mathbf{V}}_{1,2}| > |\Delta \bar{\mathbf{V}}_{13,14}| > |\Delta \bar{\mathbf{V}}_{14,15}|$$
+
+To explain this further, let's look at all households at their lowest point, which is at 8:46 p.m.
+
+![Voltage Sweep at 8:46 p.m. of all houses](../figures_qmd/node4_sweep_common_timestamp.svg){#fig-sweeping-voltage-common}
+
+The voltage behavior, as shown in @fig-sweeping-voltage-common, is clearly nonlinear. And, the voltage drop distance between households decreases as we go down the node. This explains that the voltage trend is associated with the line impedance as well as the feeder loading, rather than a particular source voltage. This behavior is explain by:
+
+$$\Delta \bar{\mathbf{V}} \approx \frac{RP+XQ}{\bar{\mathbf{V}}}$$
+
+See the derivation of the above equation in the previous Section @eq-simplified-voltage-equation.
+
+### Thinking out loud
+
+The question that we try to answer in this section is:
+
+- Can an inverter at say, house 15, raise its voltage from (e.g., 0.92) up toward a target value (1.0 p.u.)?
+
+![Inverter Operation at House 15](../figures_qmd/house15_bess_control.svg){#fig-inverter-Q}
+
+Not really. @fig-inverter-Q shows the behavior of a five kVA inverter installed at house 15. The inverter kept providing real power the whole day, resulting in $V_{max} = 0.98$. The constant injection of $Q$ is due to the fact that the target voltage, $V_{target} = 1.00~p.u.$ was never reached. Note that there is a slight change inthe head of the feeder (Node 4 at $2400~V$). The change is almost zero. Also, the residential head (the secondary side of the transformer at $120~V$) sees a low voltage change as well, at $0.006~V$. 
+
+#### Determining the relationship between Q and the Voltage
+
+We already know the relationship between the voltage and reactive power. From the Jacobian submatrix, $$\bar{J}_{4} = \frac{\partial \bar{Q}}{\partial |V|}$$
+
+Sweeping the reactive power ($Q$) from $-5~kVAr$ to $+5~kVAr$ on a $5~kVA$ inverter at house 15 causes the voltage at that house to dropt first, because we are absorbing $Q$ ($-Q$). Note that at the top plot of @fig-inverter-Q-sweep the house voltage goes from 0.88 p.u. to 0.92. However, doing the unreasonable thing and have that inverter inject reactive power ($Q$) all day long would improve the house15 voltage to 0.98 p.u., as shown in @fig-inverter-Q. 
+
+The mid plot in @fig-inverter-Q-sweep shows the voltage at the distribution transformer in [blue]{style="color: blue"} and the substation transformer in [orange]{style="color: orange;"}. The y-axis the voltage difference between the basecase and the $Q$ sweep.
+
+Note that the voltage deviation is worest at 20:46, so the @fig-inverter-Q-sweep is only running the simulation at that time.
+
+![Inverter Operation at House 15](../figures_qmd/house15_q_sweep.svg){#fig-inverter-Q-sweep}
+
+The lower plot, showing the voltages at each house, as we sweep $Q$ at the inverter at house 15. Note that the voltage difference between, for example, $+Q = 5~kVAr$ and $Q = 0~kVAr$ is larger at house 15 than at the first house. In fact, this difference decreases as we get closer to the head of the branch. Again, referring the Jacobian matrix, particularly, $J_{4}$, which describes the voltage/Q relationship:
+
+$$\frac{\partial \bar{Q}_{15}}{\partial |V_{i}|}~~~~\text{where,}~i~\in \{1,2,3,\cdots, 15\}$$
+
+We can check the results in @fig-inverter-Q-sweep against our equations, as derived in @eq-simplified-voltage-equation
+
+**Note:**
+GridLAB-D uses another version of the Jacobian Matrix, that is the Three-phase Current Injection Method (TCIM). The next few chapters explain the TCIM works.
+
+#### Verification
+
+##### **Transformer Voltage:**
+In the GridLAB-D model, the distribution transformer is rated at $50~kVA$, resistance at $1\%$, and reactance is at $6\%$. Using @eq-simplified-voltage-equation:
+
+- $r = 0.01~p.u.$
+- $x = 0.06~p.u.$
+- $S = 50~kVA$
+- $Q \in \{-5,0,5\}~kVAr$
+- $V = 240~V$
+
+Therefore:
+
+**Calculating the base $\mathbf{z}$ value:**
+$$Z_{base} = \frac{V_{base}^{2}}{S_{base}} = \frac{(240)^{2}~V}{50~KVA} = 1.15~\Omega$$
+
+Then the actual $\mathbf{x}$ becomes:
+
+$$x_{actual} = 0.06~p.u. \times 1.15~\Omega=0.069~\Omega$$
+
+**Calculating the actual $\mathbf{r}$ value:**
+
+$$r_{actual} = 0.01~p.u. \times 1.15~\Omega=0.0115~\Omega$$
+
+**Since only reactive power is being injected, we can neglect $P$ and $r$**
+Plugging in values in the $\Delta V$ equation:
+
+$$\Delta V = \frac{RP+XQ}{V} \approx \frac{XQ}{V}$$
+$$\Delta V = \frac{(0.069~\Omega)(5~kVAr)}{240~V} = 1.44~V$$
+
+**Converting the voltage back to per unit:**
+
+$$V_{p.u.} = \frac{V_{act}}{V_{base}} = \frac{1.44~V}{240~V} \approx 0.006 \approx 0.6\%$$
+
+Note that the $50~kVA$ is at the transformer, not house 15. 
+
+##### **Understanding the Jacobian used in this experiment**
+---
+The Jacobian describes how small changes in the assumed bus voltages change the calculated electrical quantities. To interpret the matrix printed by GridLAB-D, we first need to identify those voltage values and the quantities the solver is trying to balance.
+
+###### Step 1: Describe one voltage using two numbers
+
+
+Chapter 2 uses a complex voltage, written as $\bar V$. The house-15 leg-1 voltage in the zero-$Q$ case at 20:46 is
+
+$$
+\bar V_{15}=108.363349-j6.272459\ \mathrm{V}.
+$$
+
+This voltage has a real part, $108.363349$ V, and an imaginary part, $-6.272459$ V. The subscripts $R$ and $I$ identify these two parts:
+
+$$
+V_R=108.363349\ \mathrm{V},\qquad V_I=-6.272459\ \mathrm{V},
+$$
+
+so the same voltage can be written as
+
+$$
+\bar V=V_R+jV_I.
+$$
+
+This is the rectangular representation of the voltage. The magnitude and angle provide another representation of exactly the same voltage:
+
+$$
+|\bar V_{15}|=108.544733\ \mathrm{V},\qquad
+\delta_{15}=-3.312789^{\circ}.
+$$
+
+GridLAB-D's solver in this experiment works with the real and imaginary parts. A conventional angle/magnitude power-flow calculation works with the magnitude and angle instead. The physical voltage is the same; the two calculations use different pairs of numbers to describe it.
+
+The notation $e+jf$ means $V_R+jV_I$: $e$, which is the real part and $f$ is the imaginary part. We will use $V_R$ and $V_I$ here to make their meanings visible.
+
+The notation $\operatorname{Im}\{\bar V\}$ means **take the imaginary part of the voltage**. Thus:
+
+$$
+\operatorname{Im}\{\bar V_{15}\}=-6.272459\ \mathrm{V}.
+$$
+
+###### Step 2: Calculate the specified current and the current mismatch
+
+The specified power at a connection is generation minus load consumption:
+
+$$
+\bar S_{\mathrm{specified}}
+=(P_{\mathrm{inverter}}-P_{\mathrm{house}})
++j(Q_{\mathrm{inverter}}-Q_{\mathrm{house}}).
+$$
+
+Using the current iteration's voltage estimate, chapter 2's complex-power equation gives the specified device current:
+
+$$
+\bar I_{\mathrm{specified}}
+=\frac{\bar S_{\mathrm{specified}}^{*}}{\bar V^{*}}
+=\frac{(P_{\mathrm{inverter}}-P_{\mathrm{house}})
+-j(Q_{\mathrm{inverter}}-Q_{\mathrm{house}})}{\bar V^{*}}.
+$$
+
+This is the net current injected by the devices at the connection. Generation is positive; consumption is negative. For constant-power devices, the power is specified, but the current is recalculated using the voltage estimate at each iteration.
+
+For example, a **single 120 V connection** with a 1,200 W load, no reactive demand, and no inverter generation has
+
+$$
+\bar I_{\mathrm{specified}}=\frac{-1200}{120}=-10\ \mathrm{A}.
+$$
+
+The negative value means that the house consumes current rather than injecting it. This example uses one 120 V connection; the actual house model has two legs, so $240~V$.
+
+The network also determines a current from the assumed bus voltages. At house 15, the current leaving through the service line is
+
+$$
+\bar I_{\mathrm{network},15}
+=\frac{\bar V_{15}-\bar V_{\mathrm{tap15}}}{\bar Z_{\mathrm{service15}}}.
+$$
+
+For a connection with several lines, the network current is the sum of the currents leaving through those lines.
+
+The **current mismatch (instead of power mismatch)** is specified device injection minus calculated network current:
+
+$$
+\boxed{\Delta\bar I=\bar I_{\mathrm{specified}}-\bar I_{\mathrm{network}}.}
+$$
+
+Continuing the 1,200 W example, if the assumed voltages give $\bar I_{\mathrm{network}}=-9$ A, then
+
+$$
+\Delta\bar I=(-10)-(-9)=-1\ \mathrm{A}.
+$$
+
+If the network current is $-10$ A, the mismatch is zero and current balance is satisfied. Collecting the real and imaginary mismatches at all connections produces the **current mismatch vector**.
+
+The ordinary power-flow mismatch vector compares specified and calculated powers:
+
+$$
+\begin{bmatrix}
+\Delta P_i\\ \Delta Q_i
+\end{bmatrix}
+=
+\begin{bmatrix}
+P_{i,\mathrm{specified}}-P_{i,\mathrm{calculated}}\\
+Q_{i,\mathrm{specified}}-Q_{i,\mathrm{calculated}}
+\end{bmatrix}.
+$$
+
+The current-injection formulation instead compares specified and network currents. Written with the imaginary components first, matching our GridLAB-D block arrangement, this is
+
+$$
+\begin{bmatrix}
+\Delta I_{i,Im}\\ \Delta I_{i,R}
+\end{bmatrix}
+=
+\begin{bmatrix}
+I_{i,Im,\mathrm{specified}}-I_{i,Im,\mathrm{network}}\\
+I_{i,R,\mathrm{specified}}-I_{i,R,\mathrm{network}}
+\end{bmatrix}.
+$$
+
+Both parts should be approximately zero when the currents balance. The calculation below shows this for house 15.
+
+**Worked calculation: house 15 at 20:46, with inverter Q = 0**
+
+We start with the solved zero-Q case, before changing the inverter output. Every voltage and current below refers to **one balanced 120 V leg equivalent**. We do not mix whole-house power with a single-leg voltage.
+
+**1. Read the house power.** In the zero-Q simulation file, house 15 has
+
+```glm
+constant_power_12 6623.66668249131+0j;
+```
+
+This is the whole-house load across the 240 V connection:
+
+$$
+P_{\mathrm{house}}=6623.666682\ \mathrm{W},\qquad
+Q_{\mathrm{house}}=0\ \mathrm{var}.
+$$
+
+For the balanced single-leg calculation, divide the house power equally between the two legs:
+
+$$
+P_{\mathrm{house,leg}}=\frac{6623.666682}{2}
+=3311.833341\ \mathrm{W},\qquad
+Q_{\mathrm{house,leg}}=0\ \mathrm{var}.
+$$
+
+Initially the inverter has $P_{\mathrm{inv}}=0$ W and $Q_{\mathrm{inv}}=0$ var, so its contribution to either leg is zero.
+
+**2. Read the house voltage and take its conjugate.** The zero-Q voltage at house 15 is
+
+$$
+\bar V_{15}=108.363349-j6.272459\ \mathrm{V}.
+$$
+
+The specified-current equation uses the **conjugate** of this voltage. Taking the conjugate changes the sign of the imaginary part:
+
+$$
+\bar V_{15}^{*}=108.363349+j6.272459\ \mathrm{V}.
+$$
+
+**3. Calculate the specified current.** Substituting the single-leg power and voltage gives
+
+$$
+\bar I_{\mathrm{specified},15}
+=\frac{(0-3311.833341)-j(0-0)}{108.363349+j6.272459}
+=\frac{-3311.833341}{108.363349+j6.272459}.
+$$
+
+Dividing the complex numbers gives
+
+$$
+\boxed{\bar I_{\mathrm{specified},15}
+\approx-30.460244+j1.763148\ \mathrm{A}.}
+$$
+
+The denominator is voltage, not line impedance. This current comes from the specified device power and the house-voltage estimate.
+
+**4. Read the neighboring tap voltage and service-line impedance.** House 15 connects to tap 15 through the 30 ft service line:
+
+```text
+tap 15 ---- service_15 ---- house 15
+```
+
+The voltage at tap 15 is
+
+$$
+\boxed{\bar V_{\mathrm{tap15}}=108.463828-j6.246562\ \mathrm{V}.}
+$$
+
+This is a different connection from house 15. Their voltages are close because the service line is short: their magnitudes are approximately 108.644 V and 108.545 V, respectively.
+
+For the same balanced single-leg equivalent, the service impedance is
+
+$$
+\boxed{\bar Z_{15}=0.0032386364+j0.0010376674\ \Omega.}
+$$
+
+This is the impedance of `service_15` only, not the whole path from the transformer. It is the balanced-leg equivalent obtained from the model's exported impedance matrix, as used in the chapter-2 verification script.
+
+**5. Calculate the network current.** Current leaving house 15 toward tap 15 is
+
+$$
+\bar I_{\mathrm{network},15}
+=\frac{\bar V_{15}-\bar V_{\mathrm{tap15}}}{\bar Z_{15}}.
+$$
+
+These voltages are used directly, **without taking their conjugates**. First subtract their real parts:
+
+$$
+108.363349-108.463828=-0.100479\ \mathrm{V}.
+$$
+
+Then subtract their imaginary parts:
+
+$$
+-6.272459-(-6.246562)=-0.025897\ \mathrm{V}.
+$$
+
+Therefore,
+
+$$
+\bar V_{15}-\bar V_{\mathrm{tap15}}
+=-0.100479-j0.025897\ \mathrm{V}.
+$$
+
+Dividing this voltage difference by the service impedance gives
+
+$$
+\bar I_{\mathrm{network},15}
+=\frac{-0.100479-j0.025897}
+{0.0032386364+j0.0010376674}
+\approx-30.460147+j1.763243\ \mathrm{A}.
+$$
+
+This closely matches the specified current. Both currents use the same convention: current injected into the network, or leaving the house through the service line, is positive.
+
+**6. Calculate the current mismatch.** Subtract network current from specified current:
+
+$$
+\begin{aligned}
+\Delta\bar I_{15}
+&=\bar I_{\mathrm{specified},15}-\bar I_{\mathrm{network},15}\\
+&\approx(-30.460244+j1.763148)-(-30.460147+j1.763243)\\
+&\approx-0.000097-j0.000095\ \mathrm{A}
+\approx0.
+\end{aligned}
+$$
+
+The small remaining difference reflects the precision of the printed voltages and impedances. These inputs came from a solved operating point, so the specified current and network current should agree approximately. Rounded to two decimal places, both are $-30.46+j1.76$ A.
+
+The house powers, branch voltages and impedances for this calculation are recorded in `gld/verify_ch2/branch_measurements.csv`, selecting `q_injected_kvar = 0` and `branch = service_15` for the service-line values. The house demand is specified in `gld/results/house15_q_sweep/q_+00000var/case.glm`.
+
+###### Step 3: Use the current mismatch to correct the voltages
+
+The Jacobian relates voltage corrections to the current mismatch. The Newton–Raphson calculation is
+
+$$
+\boxed{\mathbf J^{(k)}\Delta\mathbf V^{(k)}=\Delta\mathbf I^{(k)}.}
+$$
+
+Here, $k$ identifies the current iteration. The vector $\Delta\mathbf I^{(k)}$ contains the current mismatches just calculated. The vector $\Delta\mathbf V^{(k)}$ contains the real and imaginary voltage corrections. After solving for those corrections, the voltages are updated:
+
+$$
+\mathbf V^{(k+1)}=\mathbf V^{(k)}+\Delta\mathbf V^{(k)}.
+$$
+
+GridLAB-D then recalculates the currents and mismatches using the updated voltages. This repeats until the solver's convergence checks are satisfied.
+
+The Jacobian accounts for how both network current and specified device current change with voltage. Its entries are derivatives of network current minus specified device current, with respect to the voltage components. The entries have units A/V. This includes the voltage dependence of constant-power device current.
+
+All connected voltage corrections are calculated together. For example, changing house-15 voltage changes service-line current at both house 15 and tap 15.
+
+###### Step 4: Identify what TCIM means
+
+**TCIM is the three-phase current-injection method.** It is the name of GridLAB-D's current-balance power-flow formulation. It can also handle the single-phase and split-phase connections in this model; the name does not mean that every connection in this experiment has three phases.
+
+The settings `solver_method NR` and `NR_solver_algorithm TCIM` describe two related choices:
+
+- **TCIM** identifies the equations and voltage representation: current balance using real/imaginary voltage components.
+- **NR** identifies how those equations are solved: repeated Newton–Raphson voltage corrections.
+
+Consequently, the printed matrix describes changes in **current mismatch** caused by changes in **real/imaginary voltage**, rather than changes in $P$ and $Q$ caused by changes in voltage angle and magnitude.
+
+###### Step 5: Write the full Jacobian with each quantity defined
+
+First, consider the conventional power-flow Jacobian used when discussing $\mathbf J_4$. The quantities involved are:
+
+| Symbol | Meaning |
+|---|---|
+| $\mathbf P$ | List of calculated real-power injections at the included connections |
+| $\mathbf Q$ | List of calculated reactive-power injections at those connections |
+| $\boldsymbol\delta$ | List of voltage angles |
+| $\mathbf v$ | List of voltage magnitudes, $v_i=|\bar V_i|$ |
+
+Power injection is positive for generation and negative for consumption. Bold symbols collect values from multiple connections into vectors. Each Jacobian entry is a partial derivative: one quantity changes while the other independent voltage variables remain fixed.
+
+The four blocks are
+
+$$
+\boxed{
+\mathbf J_{PQ}=
+\begin{bmatrix}
+\mathbf J_1 & \mathbf J_2\\
+\mathbf J_3 & \mathbf J_4
+\end{bmatrix}
+=
+\begin{bmatrix}
+\dfrac{\partial\mathbf P}{\partial\boldsymbol\delta}
+&\dfrac{\partial\mathbf P}{\partial\mathbf v}\\[6pt]
+\dfrac{\partial\mathbf Q}{\partial\boldsymbol\delta}
+&\dfrac{\partial\mathbf Q}{\partial\mathbf v}
+\end{bmatrix}.
+}
+$$ {#eq-conventional-jacobian}
+
+For a Newton calculation, $\Delta\mathbf P$ and $\Delta\mathbf Q$ are the specified power injections minus the injections calculated from the current voltage estimate. The required voltage corrections satisfy
+
+$$
+\begin{bmatrix}
+\mathbf J_1 & \mathbf J_2\\
+\mathbf J_3 & \mathbf J_4
+\end{bmatrix}
+\begin{bmatrix}
+\Delta\boldsymbol\delta\\ \Delta\mathbf v
+\end{bmatrix}
+=
+\begin{bmatrix}
+\Delta\mathbf P\\ \Delta\mathbf Q
+\end{bmatrix}.
+$$
+
+In particular, $(\mathbf J_4)_{15,15}$ describes how calculated $Q_{15}$ changes with house-15 voltage magnitude **while all angles and other magnitudes remain fixed**. The inverter sweep does not hold those other quantities fixed. Its measured voltage response therefore cannot be obtained by simply taking the reciprocal of that one entry. The other blocks also participate in the voltage response.
+
+For GridLAB-D, the voltage variables are the real and imaginary components, rather than magnitude and angle. The mismatch vector contains imaginary-current mismatches first and real-current mismatches second when grouped into the following block form:
+
+$$
+\boxed{
+\begin{bmatrix}
+\Delta\mathbf I_{Im}\\
+\Delta\mathbf I_R
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\mathbf A & \mathbf B\\
+\mathbf C & \mathbf D
+\end{bmatrix}
+}_{\mathbf J_{\mathrm{TCIM}}}
+\begin{bmatrix}
+\Delta\mathbf V_R\\
+\Delta\mathbf V_{Im}
+\end{bmatrix}.
+}
+$$ {#eq-gridlabd-jacobian}
+
+The subscript $R$ identifies real parts, and $Im$ identifies imaginary parts. Each block describes a particular current/voltage relationship:
+
+$$
+\begin{aligned}
+\mathbf A&=\frac{\partial(\mathbf I_{\mathrm{network},Im}-\mathbf I_{\mathrm{specified},Im})}{\partial\mathbf V_R},
+&\mathbf B&=\frac{\partial(\mathbf I_{\mathrm{network},Im}-\mathbf I_{\mathrm{specified},Im})}{\partial\mathbf V_{Im}},\\[6pt]
+\mathbf C&=\frac{\partial(\mathbf I_{\mathrm{network},R}-\mathbf I_{\mathrm{specified},R})}{\partial\mathbf V_R},
+&\mathbf D&=\frac{\partial(\mathbf I_{\mathrm{network},R}-\mathbf I_{\mathrm{specified},R})}{\partial\mathbf V_{Im}}.
+\end{aligned}
+$$
+
+The specified-minus-network current mismatch is on the left of @eq-gridlabd-jacobian. The Jacobian describes the voltage corrections needed to close that difference. The blocks describe current/voltage derivatives; $\mathbf D$ is not the conventional $\mathbf J_4=\partial\mathbf Q/\partial\mathbf v$.
+
+For a three-bus system with one fixed slack bus and two single-phase PQ buses, the four voltage corrections belong to buses 2 and 3:
+
+$$
+\begin{bmatrix}
+\Delta I_{2,Im}\\
+\Delta I_{3,Im}\\
+\Delta I_{2,R}\\
+\Delta I_{3,R}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mathbf A & \mathbf B\\
+\mathbf C & \mathbf D
+\end{bmatrix}
+\begin{bmatrix}
+\Delta V_{2,R}\\
+\Delta V_{3,R}\\
+\Delta V_{2,Im}\\
+\Delta V_{3,Im}
+\end{bmatrix}.
+$$
+
+Each block is $2\times2$, so this non-slack system is $4\times4$. The current mismatches are calculated from the current voltage estimate, and the voltage corrections are added to obtain the next estimate.
+
+In this three-bus example, the Jacobian matrix becomes:
+
+<!-- $$
+\begin{bmatrix}
+\frac{\partial I_{2, Im}}{\partial V_{2,R}} & \frac{\partial I_{2, Im}}{\partial V_{3,R}} & \frac{\partial I_{2, Im}}{\partial V_{2,Im}} & \frac{\partial I_{2, Im}}{\partial V_{2,Im}} \\
+\frac{\partial I_{3, Im}}{\partial V_{3,R}} & \frac{\partial I_{3, Im}}{\partial V_{3,R}} & \frac{\partial I_{3, Im}}{\partial V_{2,Im}} & \frac{\partial I_{3, Im}}{\partial V_{2,Im}} \\
+\frac{\partial I_{2, R}}{\partial V_{2,R}} & \frac{\partial I_{2, R}}{\partial V_{3,R}} & \frac{\partial I_{2, R}}{\partial V_{2,Im}} & \frac{\partial I_{2, R}}{\partial V_{2,Im}} \\
+\frac{\partial I_{3, R}}{\partial V_{3,R}} & \frac{\partial I_{3, R}}{\partial V_{3,R}} & \frac{\partial I_{3, R}}{\partial V_{2,Im}} & \frac{\partial I_{3, R}}{\partial V_{2,Im}} \\
+\end{bmatrix}
+$$ -->
+
+$$
+\underbrace{
+\left[
+\begin{array}{cc|cc}
+\frac{\partial I_{2,Im}}{\partial V_{2,R}} &
+\frac{\partial I_{2,Im}}{\partial V_{3,R}} &
+\frac{\partial I_{2,Im}}{\partial V_{2,Im}} &
+\frac{\partial I_{2,Im}}{\partial V_{3,Im}} \\[10pt]
+\frac{\partial I_{3,Im}}{\partial V_{2,R}} &
+\frac{\partial I_{3,Im}}{\partial V_{3,R}} &
+\frac{\partial I_{3,Im}}{\partial V_{2,Im}} &
+\frac{\partial I_{3,Im}}{\partial V_{3,Im}} \\ \hline
+\frac{\partial I_{2,R}}{\partial V_{2,R}} &
+\frac{\partial I_{2,R}}{\partial V_{3,R}} &
+\frac{\partial I_{2,R}}{\partial V_{2,Im}} &
+\frac{\partial I_{2,R}}{\partial V_{3,Im}} \\[10pt]
+\frac{\partial I_{3,R}}{\partial V_{2,R}} &
+\frac{\partial I_{3,R}}{\partial V_{3,R}} &
+\frac{\partial I_{3,R}}{\partial V_{2,Im}} &
+\frac{\partial I_{3,R}}{\partial V_{3,Im}}
+\end{array}
+\right]
+}_{\displaystyle J =
+\left[\begin{smallmatrix} A & B \\ C & D \end{smallmatrix}\right]}
+$$
+
+###### Step 6: Count the numbers stored in this model
+
+Each complex voltage requires a real and an imaginary part. Each house has two voltage legs, so it contributes four real numbers:
+
+$$
+V_{R,1},\quad V_{R,2},\quad V_{I,1},\quad V_{I,2}.
+$$
+
+The exported bus mapping gives the complete count:
+
+| Connections | Number | Real numbers per connection | Total |
+|---|---:|---:|---:|
+| Fixed upstream source, phase A | 1 | 2 | 2 |
+| Node4 primary, phase A | 1 | 2 | 2 |
+| Transformer-secondary meter, two legs | 1 | 4 | 4 |
+| House taps, two legs each | 15 | 4 | 60 |
+| Houses, two legs each | 15 | 4 | 60 |
+| **Total** | | | **128** |
+
+The source voltage is fixed. GridLAB-D nevertheless retains its two positions in the exported matrix. It uses large diagonal entries ($10^{10}$ in this dump) and skips source-voltage updates during the normal solve. Those rows are special source constraints, rather than ordinary unknown-bus current-balance equations. Excluding the source's two fixed voltage components would leave 126 values to solve for.
+
+The matrix is square because it supplies one equation for each stored voltage component. If all real voltage components were placed first and all imaginary components second, its four blocks would each be $64\times64$.
+
+The raw CSV instead stores components together by bus. At a split-phase bus, its columns are ordered as
+
+$$
+[V_{R,1},\ V_{R,2},\ V_{I,1},\ V_{I,2}],
+$$
+
+and its current-mismatch rows are ordered as
+
+$$
+[\Delta I_{1,Im},\ \Delta I_{2,Im},\ \Delta I_{1,R},\ \Delta I_{2,R}].
+$$
+
+Consequently, the four global derivative blocks cannot be extracted simply by cutting the raw CSV into four equal rectangles. The rows and columns first need to be grouped according to their meanings.
+
+###### Step 7: Read the house-15 numerical block
+
+At 20:46 PDT with inverter $Q=0$, the exported matrix assigns indices 90–93 to house 15. The four columns correspond to its two real voltage parts followed by its two imaginary voltage parts. The four rows correspond to its two imaginary current-balance equations followed by its two real current-balance equations.
+
+The house-15 rows and house-15 columns contain
+
+$$
+\mathbf J_{\mathrm{TCIM}}^{(15,15)}=
+\left[
+\begin{array}{rr|rr}
+-71.195871 & -18.508666 & 191.378894 & 88.926892\\
+18.508666 & 71.195871 & -88.926892 & -191.378894\\ \hline
+191.098270 & 88.926892 & 71.212115 & 18.508666\\
+-88.926892 & -191.098270 & -18.508666 & -71.212115
+\end{array}
+\right].
+$$ {#eq-house15-tcim-block}
+
+For example, the first row and third column contain $191.378894$ A/V. This entry describes the change in leg-1 imaginary network current minus specified device current caused by a small change in the leg-1 imaginary voltage, with the other voltage components fixed. A $0.001$ V increase would therefore increase that calculated current difference by approximately $0.191379$ A before other voltages are adjusted.
+
+This $4\times4$ block describes house 15's own voltage components. The complete house-15 equations also contain entries in the columns for tap 15, because the service-line current depends on both ends of that line. Those neighboring entries are one reason the complete network matrix is needed.

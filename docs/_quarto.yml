@@ -10,15 +10,19 @@ book:
     - text: "Homepage"
       file: index.qmd
     - text: "Introduction"
-      file: sections/_ch1_intro.qmd
+      file: sections/ch1_intro.qmd
     - text: "Literature Review"
-      file: sections/_ch2_gan_low_lit_review.qmd
+      file: sections/ch2_gan_low_lit_review.qmd
     - text: "DistFlow Equations"
-      file: sections/_ch2_eqautions_derivation.qmd
+      file: sections/ch2_eqautions_derivation.qmd
+    - text: "Research Outline"
+      file: sections/ch3_research_outline.qmd
     - text: "Testing Setup"
-      file: sections/_ch3_initial_testing.qmd
+      file: sections/ch4_initial_testing.qmd
+    - text: "Adressing first RQ"
+      file: sections/ch5_first_rq.qmd
     - text: "Equations Derivation for Inverter Reactive Power"
-      file: sections/_ch4_inverter_reactive_power_derivation.qmd
+      file: sections/ch6_inverter_reactive_power_derivation.qmd
     - references.qmd
     # - text: "Voltage Equation Derivations"
     #   file: voltage_eq.qmd
@@ -56,3 +60,7 @@ format:
     number-sections: true
   pdf:
     number-sections: true
+    include-in-header: 
+      text: |
+        \usepackage{nicematrix}
+        \usepackage{tikz}

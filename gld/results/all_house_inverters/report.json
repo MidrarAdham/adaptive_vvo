@@ -1,0 +1,15 @@
+{
+  "target_pu": 0.95,
+  "tolerance_pu": 0.005,
+  "inverters": 15,
+  "rating_va_each": 5000,
+  "p_w_each": 0,
+  "samples": 1439,
+  "baseline_rmse_pu": 0.02304320156679896,
+  "controlled_rmse_pu": 0.008732655414248074,
+  "fraction_within_tolerance": 0.6158443363446838,
+  "max_error_pu": 0.036091666666666744,
+  "peak_transformer_secondary_kva": 30.032020715677792,
+  "method": "Offline coordinated bounded least squares using minute-specific finite-difference sensitivities; local solution, not proof of global feasibility",
+  "fraction_of_times_all_houses_within_tolerance": 0.0
+}

@@ -118,7 +118,46 @@ $$|\bar{Z}_{i-1}|^{2}~|\bar{I}_{i-1}|^{2} = (r^{2}_{i-1} + x^{2}_{i-1})~(\frac{P
 
 Substituting @eq-voltage-ref2 and @eq-voltage-ref3 in @eq-voltage-ref1:
 
-$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+(r^{2}_{i-1} + x^{2}_{i-1})~\frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}}$$ {#eq-voltage-distflow}
+$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+(r^{2}_{i-1} + x^{2}_{i-1})~\frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}}$${#eq-voltage-distflow}
+
+Note that @eq-voltage-distflow is essentially:
+$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})+\underbrace{(r^{2}_{i-1} + x^{2}_{i-1})}_{\text{Imedance }Z^{2}}\underbrace{~\frac{P^{2}_{i-1}+Q^{2}_{i-1}}{|\bar{V}_{i-1}|^{2}}}_{\text{Current }I^{2}}$$
+
+$V = ZI$, making the last term a loss term. This loss term is a second order contribution associated with line losses. Assuming the losses insignificant, we can drop this term and the equation becomes:
+
+$$|\bar{V}_{i}|^{2} = |\bar{V}_{i-1}|^{2} - 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})$$
+
+Rearranging the equation:
+
+$$(|\bar{V}_{i}|^{2} - |\bar{V}_{i-1}|^{2}) \approx 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})$$
+
+Recall $a^{2} - b^{2} = (a-b)(a+b)$:
+
+$$(|\bar{V}_{i}| - |\bar{V}_{i-1}|)(|\bar{V}_{i}| + |\bar{V}_{i-1}|) \approx 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})$$
+
+Defining the voltage drop as: $\Delta V = |\bar{V}_{i-1}| - |\bar{V}_{i}|$:
+
+$$\Delta V(|\bar{V}_{i}| + |\bar{V}_{i-1}|) \approx 2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})$$
+
+Solving for $\Delta V$:
+
+$$\Delta V \approx \frac{2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})}{(|\bar{V}_{i}| + |\bar{V}_{i-1}|)}$$
+
+**Assuming the voltage difference between adjascent buses is small:**
+
+$$|\bar{V}_{i}| \approx |\bar{V}_{i-1}| \approx V$$
+
+Therefore,
+
+$$|\bar{V}_{i}| + |\bar{V}_{i-1}| \approx 2V$$
+
+substituting in the previous $\Delta V$ equation:
+
+$$\Delta V \approx \frac{2(r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1})}{2V}$$
+
+Cancelling the 2:
+
+$$\Delta V \approx \frac{r_{i-1}~P_{i-1} + x_{i-1}~Q_{i-1}}{V}$${#eq-simplified-voltage-equation}
 
 ::: {.callout-note appearance="simple"}
 ## Note

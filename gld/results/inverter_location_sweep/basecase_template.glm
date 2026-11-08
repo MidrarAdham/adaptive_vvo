@@ -1,0 +1,1333 @@
+// Run from gld/basecase: gridlabd 4_node.glm
+// Residential secondary feeder: 30 houses along a shared 120/240 V main.
+// Fixed upstream source feeds Node4 through a primary line with finite impedance.
+module tape;
+module powerflow {
+    solver_method NR;
+};
+clock {
+    timezone US/OR/Portland;
+    timestamp '2025-09-01 00:00:00';
+    stoptime '2025-09-01 23:59:00';
+}
+
+object node {
+    name upstream_source;
+    bustype SWING;
+    phases AN;
+    nominal_voltage 2400;
+    voltage_A 2400+0j;
+}
+
+// Original four-node feeder conductor data: resistance in ohm/mile, GMR in ft.
+object overhead_line_conductor {
+    name OH100;
+    geometric_mean_radius 0.0244;
+    resistance 0.306;
+}
+object overhead_line_conductor {
+    name OH101;
+    geometric_mean_radius 0.00814;
+    resistance 0.592;
+}
+object line_spacing {
+    name LS200;
+    distance_AB 2.5;
+    distance_BC 4.5;
+    distance_AC 7.0;
+    distance_AN 5.656854;
+    distance_BN 4.272002;
+    distance_CN 5.0;
+}
+// The AN upstream line uses conductor A, neutral, and their spacing.
+// B/C definitions retain the original configuration for future three-phase use.
+object line_configuration {
+    name LC300;
+    conductor_A OH100;
+    conductor_B OH100;
+    conductor_C OH100;
+    conductor_N OH101;
+    spacing LS200;
+}
+object overhead_line {
+    name upstream_line;
+    phases AN;
+    from upstream_source;
+    to Node4;
+    length 1000 ft;
+    configuration LC300;
+}
+object node {
+    name Node4;
+    phases AN;
+    nominal_voltage 2400;
+}
+
+// Study assumption: 50 kVA service transformer, existing 1% R / 6% X.
+// GridLAB-D center-tapped secondary_voltage is the 120 V leg base.
+object transformer_configuration {
+    name PoleTop;
+    connect_type SINGLE_PHASE_CENTER_TAPPED;
+    install_type POLETOP;
+    power_rating 50;
+    powerA_rating 50;
+    primary_voltage 2400;
+    secondary_voltage 120;
+    resistance 0.01;
+    reactance 0.06;
+}
+object transformer {
+    name split_boi;
+    phases AS;
+    from Node4;
+    to mr_meter1;
+    configuration PoleTop;
+}
+object triplex_meter {
+    name mr_meter1;
+    phases AS;
+    nominal_voltage 120;
+}
+
+// Retained conductor/geometry assumptions, not a utility equipment specification.
+object triplex_line_conductor {
+    name Name_1_0_AA_triplex;
+    resistance 0.57;
+    geometric_mean_radius 0.0111;
+}
+object triplex_line_configuration {
+    name triplex_line_config;
+    conductor_1 Name_1_0_AA_triplex;
+    conductor_2 Name_1_0_AA_triplex;
+    conductor_N Name_1_0_AA_triplex;
+    insulation_thickness 0.1;
+    diameter 0.4;
+}
+
+// Shared main: 100 ft between taps; each house has a separate 30 ft service.
+// Demand scenario: 1.5x original profiles, full day; originals remain in datasets/.
+// Whole-house demand is a balanced 240 V equivalent at unity power factor.
+// This preserves profile power without assigning the whole house to one 120 V leg.
+
+// House 1: tap is 100 ft along the main from the transformer.
+object triplex_node {
+    name tap_1;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_1;
+    phases AS;
+    from mr_meter1;
+    to tap_1;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_1;
+    phases AS;
+    from tap_1;
+    to house_1;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_1;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_1_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_1.csv";
+    };
+}
+object recorder {
+    name house_1_voltage_recorder;
+    parent house_1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_1_voltage.csv";
+}
+
+// House 2: tap is 200 ft along the main from the transformer.
+object triplex_node {
+    name tap_2;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_2;
+    phases AS;
+    from tap_1;
+    to tap_2;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_2;
+    phases AS;
+    from tap_2;
+    to house_2;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_2;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_2_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_2.csv";
+    };
+}
+object recorder {
+    name house_2_voltage_recorder;
+    parent house_2;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_2_voltage.csv";
+}
+
+// House 3: tap is 300 ft along the main from the transformer.
+object triplex_node {
+    name tap_3;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_3;
+    phases AS;
+    from tap_2;
+    to tap_3;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_3;
+    phases AS;
+    from tap_3;
+    to house_3;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_3;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_3_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_3.csv";
+    };
+}
+object recorder {
+    name house_3_voltage_recorder;
+    parent house_3;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_3_voltage.csv";
+}
+
+// House 4: tap is 400 ft along the main from the transformer.
+object triplex_node {
+    name tap_4;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_4;
+    phases AS;
+    from tap_3;
+    to tap_4;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_4;
+    phases AS;
+    from tap_4;
+    to house_4;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_4;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_4_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_4.csv";
+    };
+}
+object recorder {
+    name house_4_voltage_recorder;
+    parent house_4;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_4_voltage.csv";
+}
+
+// House 5: tap is 500 ft along the main from the transformer.
+object triplex_node {
+    name tap_5;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_5;
+    phases AS;
+    from tap_4;
+    to tap_5;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_5;
+    phases AS;
+    from tap_5;
+    to house_5;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_5;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_5_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_5.csv";
+    };
+}
+object recorder {
+    name house_5_voltage_recorder;
+    parent house_5;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_5_voltage.csv";
+}
+
+// House 6: tap is 600 ft along the main from the transformer.
+object triplex_node {
+    name tap_6;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_6;
+    phases AS;
+    from tap_5;
+    to tap_6;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_6;
+    phases AS;
+    from tap_6;
+    to house_6;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_6;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_6_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_6.csv";
+    };
+}
+object recorder {
+    name house_6_voltage_recorder;
+    parent house_6;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_6_voltage.csv";
+}
+
+// House 7: tap is 700 ft along the main from the transformer.
+object triplex_node {
+    name tap_7;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_7;
+    phases AS;
+    from tap_6;
+    to tap_7;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_7;
+    phases AS;
+    from tap_7;
+    to house_7;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_7;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_7_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_7.csv";
+    };
+}
+object recorder {
+    name house_7_voltage_recorder;
+    parent house_7;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_7_voltage.csv";
+}
+
+// House 8: tap is 800 ft along the main from the transformer.
+object triplex_node {
+    name tap_8;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_8;
+    phases AS;
+    from tap_7;
+    to tap_8;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_8;
+    phases AS;
+    from tap_8;
+    to house_8;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_8;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_8_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_8.csv";
+    };
+}
+object recorder {
+    name house_8_voltage_recorder;
+    parent house_8;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_8_voltage.csv";
+}
+
+// House 9: tap is 900 ft along the main from the transformer.
+object triplex_node {
+    name tap_9;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_9;
+    phases AS;
+    from tap_8;
+    to tap_9;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_9;
+    phases AS;
+    from tap_9;
+    to house_9;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_9;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_9_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_9.csv";
+    };
+}
+object recorder {
+    name house_9_voltage_recorder;
+    parent house_9;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_9_voltage.csv";
+}
+
+// House 10: tap is 1000 ft along the main from the transformer.
+object triplex_node {
+    name tap_10;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_10;
+    phases AS;
+    from tap_9;
+    to tap_10;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_10;
+    phases AS;
+    from tap_10;
+    to house_10;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_10;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_10_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_10.csv";
+    };
+}
+object recorder {
+    name house_10_voltage_recorder;
+    parent house_10;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_10_voltage.csv";
+}
+
+// House 11: tap is 1100 ft along the main from the transformer.
+object triplex_node {
+    name tap_11;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_11;
+    phases AS;
+    from tap_10;
+    to tap_11;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_11;
+    phases AS;
+    from tap_11;
+    to house_11;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_11;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_11_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_11.csv";
+    };
+}
+object recorder {
+    name house_11_voltage_recorder;
+    parent house_11;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_11_voltage.csv";
+}
+
+// House 12: tap is 1200 ft along the main from the transformer.
+object triplex_node {
+    name tap_12;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_12;
+    phases AS;
+    from tap_11;
+    to tap_12;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_12;
+    phases AS;
+    from tap_12;
+    to house_12;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_12;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_12_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_12.csv";
+    };
+}
+object recorder {
+    name house_12_voltage_recorder;
+    parent house_12;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_12_voltage.csv";
+}
+
+// House 13: tap is 1300 ft along the main from the transformer.
+object triplex_node {
+    name tap_13;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_13;
+    phases AS;
+    from tap_12;
+    to tap_13;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_13;
+    phases AS;
+    from tap_13;
+    to house_13;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_13;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_13_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_13.csv";
+    };
+}
+object recorder {
+    name house_13_voltage_recorder;
+    parent house_13;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_13_voltage.csv";
+}
+
+// House 14: tap is 1400 ft along the main from the transformer.
+object triplex_node {
+    name tap_14;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_14;
+    phases AS;
+    from tap_13;
+    to tap_14;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_14;
+    phases AS;
+    from tap_14;
+    to house_14;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_14;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_14_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_14.csv";
+    };
+}
+object recorder {
+    name house_14_voltage_recorder;
+    parent house_14;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_14_voltage.csv";
+}
+
+// House 15: tap is 1500 ft along the main from the transformer.
+object triplex_node {
+    name tap_15;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_15;
+    phases AS;
+    from tap_14;
+    to tap_15;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_15;
+    phases AS;
+    from tap_15;
+    to house_15;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_15;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_15_profile;
+        property constant_power_12;
+        file "../datasets/scaled_1p5/house_profile_15.csv";
+    };
+}
+object recorder {
+    name house_15_voltage_recorder;
+    parent house_15;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/house_15_voltage.csv";
+}
+
+// House 16: tap is 1600 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_16;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_16;
+//     phases AS;
+//     from tap_15;
+//     to tap_16;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_16;
+//     phases AS;
+//     from tap_16;
+//     to house_16;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_16;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_16_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_16.csv";
+//     };
+// }
+// object recorder {
+//     name house_16_voltage_recorder;
+//     parent house_16;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_16_voltage.csv";
+// }
+
+// // House 17: tap is 1700 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_17;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_17;
+//     phases AS;
+//     from tap_16;
+//     to tap_17;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_17;
+//     phases AS;
+//     from tap_17;
+//     to house_17;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_17;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_17_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_17.csv";
+//     };
+// }
+// object recorder {
+//     name house_17_voltage_recorder;
+//     parent house_17;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_17_voltage.csv";
+// }
+
+// // House 18: tap is 1800 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_18;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_18;
+//     phases AS;
+//     from tap_17;
+//     to tap_18;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_18;
+//     phases AS;
+//     from tap_18;
+//     to house_18;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_18;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_18_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_18.csv";
+//     };
+// }
+// object recorder {
+//     name house_18_voltage_recorder;
+//     parent house_18;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_18_voltage.csv";
+// }
+
+// // House 19: tap is 1900 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_19;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_19;
+//     phases AS;
+//     from tap_18;
+//     to tap_19;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_19;
+//     phases AS;
+//     from tap_19;
+//     to house_19;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_19;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_19_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_19.csv";
+//     };
+// }
+// object recorder {
+//     name house_19_voltage_recorder;
+//     parent house_19;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_19_voltage.csv";
+// }
+
+// // House 20: tap is 2000 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_20;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_20;
+//     phases AS;
+//     from tap_19;
+//     to tap_20;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_20;
+//     phases AS;
+//     from tap_20;
+//     to house_20;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_20;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_20_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_20.csv";
+//     };
+// }
+// object recorder {
+//     name house_20_voltage_recorder;
+//     parent house_20;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_20_voltage.csv";
+// }
+
+// House 21: tap is 2100 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_21;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_21;
+//     phases AS;
+//     from tap_20;
+//     to tap_21;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_21;
+//     phases AS;
+//     from tap_21;
+//     to house_21;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_21;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_21_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_21.csv";
+//     };
+// }
+// object recorder {
+//     name house_21_voltage_recorder;
+//     parent house_21;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_21_voltage.csv";
+// }
+
+// // House 22: tap is 2200 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_22;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_22;
+//     phases AS;
+//     from tap_21;
+//     to tap_22;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_22;
+//     phases AS;
+//     from tap_22;
+//     to house_22;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_22;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_22_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_22.csv";
+//     };
+// }
+// object recorder {
+//     name house_22_voltage_recorder;
+//     parent house_22;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_22_voltage.csv";
+// }
+
+// // House 23: tap is 2300 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_23;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_23;
+//     phases AS;
+//     from tap_22;
+//     to tap_23;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_23;
+//     phases AS;
+//     from tap_23;
+//     to house_23;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_23;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_23_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_23.csv";
+//     };
+// }
+// object recorder {
+//     name house_23_voltage_recorder;
+//     parent house_23;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_23_voltage.csv";
+// }
+
+// // House 24: tap is 2400 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_24;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_24;
+//     phases AS;
+//     from tap_23;
+//     to tap_24;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_24;
+//     phases AS;
+//     from tap_24;
+//     to house_24;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_24;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_24_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_24.csv";
+//     };
+// }
+// object recorder {
+//     name house_24_voltage_recorder;
+//     parent house_24;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_24_voltage.csv";
+// }
+
+// // House 25: tap is 2500 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_25;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_25;
+//     phases AS;
+//     from tap_24;
+//     to tap_25;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_25;
+//     phases AS;
+//     from tap_25;
+//     to house_25;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_25;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_25_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_25.csv";
+//     };
+// }
+// object recorder {
+//     name house_25_voltage_recorder;
+//     parent house_25;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_25_voltage.csv";
+// }
+
+// // House 26: tap is 2600 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_26;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_26;
+//     phases AS;
+//     from tap_25;
+//     to tap_26;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_26;
+//     phases AS;
+//     from tap_26;
+//     to house_26;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_26;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_26_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_26.csv";
+//     };
+// }
+// object recorder {
+//     name house_26_voltage_recorder;
+//     parent house_26;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_26_voltage.csv";
+// }
+
+// // House 27: tap is 2700 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_27;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_27;
+//     phases AS;
+//     from tap_26;
+//     to tap_27;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_27;
+//     phases AS;
+//     from tap_27;
+//     to house_27;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_27;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_27_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_27.csv";
+//     };
+// }
+// object recorder {
+//     name house_27_voltage_recorder;
+//     parent house_27;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_27_voltage.csv";
+// }
+
+// // House 28: tap is 2800 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_28;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_28;
+//     phases AS;
+//     from tap_27;
+//     to tap_28;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_28;
+//     phases AS;
+//     from tap_28;
+//     to house_28;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_28;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_28_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_28.csv";
+//     };
+// }
+// object recorder {
+//     name house_28_voltage_recorder;
+//     parent house_28;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_28_voltage.csv";
+// }
+
+// // House 29: tap is 2900 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_29;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_29;
+//     phases AS;
+//     from tap_28;
+//     to tap_29;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_29;
+//     phases AS;
+//     from tap_29;
+//     to house_29;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_29;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_29_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_29.csv";
+//     };
+// }
+// object recorder {
+//     name house_29_voltage_recorder;
+//     parent house_29;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_29_voltage.csv";
+// }
+
+// // House 30: tap is 3000 ft along the main from the transformer.
+// object triplex_node {
+//     name tap_30;
+//     phases AS;
+//     nominal_voltage 120;
+// }
+// object triplex_line {
+//     name main_30;
+//     phases AS;
+//     from tap_29;
+//     to tap_30;
+//     length 100 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_line {
+//     name service_30;
+//     phases AS;
+//     from tap_30;
+//     to house_30;
+//     length 30 ft;
+//     configuration triplex_line_config;
+// }
+// object triplex_load {
+//     name house_30;
+//     phases AS;
+//     nominal_voltage 120;
+//     object player {
+//         name house_30_profile;
+//         property constant_power_12;
+//         file "../datasets/scaled_1p5/house_profile_30.csv";
+//     };
+// }
+// object recorder {
+//     name house_30_voltage_recorder;
+//     parent house_30;
+//     property voltage_1,voltage_2;
+//     interval 60;
+//     file "../results/basecase/house_30_voltage.csv";
+// }
+
+// Residential feeder head is the transformer SECONDARY.
+object recorder {
+    name rec;
+    parent mr_meter1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "../results/basecase/voltage_a.csv";
+}
+object recorder {
+    name service_power_recorder;
+    parent mr_meter1;
+    property measured_real_power,measured_reactive_power;
+    interval 60;
+    file "../results/basecase/service_power.csv";
+}
+object recorder {
+    name node4_voltage_recorder;
+    parent Node4;
+    property voltage_A;
+    interval 60;
+    file "../results/basecase/node4_voltage.csv";
+}

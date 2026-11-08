@@ -1,0 +1,58 @@
+{
+  "timestamp_local": "2025-09-01 20:46:00",
+  "inverter_houses": [
+    15,
+    14,
+    13,
+    12,
+    11,
+    10,
+    9,
+    8,
+    7,
+    6,
+    5,
+    4,
+    3,
+    2,
+    1
+  ],
+  "head_node": "Node4",
+  "head_pu": [
+    0.95,
+    0.96,
+    0.97,
+    0.98,
+    0.99,
+    1.0,
+    1.01,
+    1.02,
+    1.03,
+    1.04,
+    1.05
+  ],
+  "q_var": [
+    -5000,
+    -4000,
+    -3000,
+    -2000,
+    -1000,
+    0,
+    1000,
+    2000,
+    3000,
+    4000,
+    5000
+  ],
+  "load_factors": [
+    0.75,
+    1.0,
+    1.25
+  ],
+  "load_factor_reference": "Current profile files (already scaled 1.5x)",
+  "basecase_sha256": "3c99035097b3213f92f3e0c21533bbbdf12df1d272eadf8332899b59d47976b2",
+  "inverter_va": 5000,
+  "real_power_w": 0,
+  "cases": 5445,
+  "boundary": "Node4 imposed as SWING; upstream source and line removed in generated cases"
+}

@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.10.19">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Motivation – Advanced Power System Analysis</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: 1.5em;}
+div.column{flex: auto;}
+@media screen {
+div.columns{gap: min(4vw, 1.5em);}
+div.column{overflow-x: auto;}
+}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+</style>
+
+
+<script src="../site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="../site_libs/quarto-nav/headroom.min.js"></script>
+<script src="../site_libs/clipboard/clipboard.min.js"></script>
+<script src="../site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="../site_libs/quarto-search/fuse.min.js"></script>
+<script src="../site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="../">
+<link href="../sections/ch4_initial_testing.html" rel="next">
+<link href="../sections/ch2_eqautions_derivation.html" rel="prev">
+<script src="../site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="../site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="../site_libs/quarto-html/popper.min.js"></script>
+<script src="../site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="../site_libs/quarto-html/anchor.min.js"></script>
+<link href="../site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-bf27225e3a48a9273f3daa8f8e829971.css" rel="stylesheet" class="quarto-color-scheme" id="quarto-text-highlighting-styles">
+<link href="../site_libs/quarto-html/quarto-syntax-highlighting-dark-b626d73c4c936ccc3cb08be7d45d1df6.css" rel="stylesheet" class="quarto-color-scheme quarto-color-alternate" id="quarto-text-highlighting-styles">
+<script src="../site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="../site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="../site_libs/bootstrap/bootstrap-61f989f1291c5c8f04a19c64454ac263.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme" id="quarto-bootstrap" data-mode="light">
+<link href="../site_libs/bootstrap/bootstrap-dark-ff076740a053ba63d7e1b6f5eb229c32.min.css" rel="stylesheet" append-hash="true" class="quarto-color-scheme quarto-color-alternate" id="quarto-bootstrap" data-mode="dark">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<style>html{ scroll-behavior: smooth; }</style>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-dark"><script id="quarto-html-before-body" type="application/javascript">
+    const toggleBodyColorMode = (bsSheetEl) => {
+      const mode = bsSheetEl.getAttribute("data-mode");
+      const bodyEl = window.document.querySelector("body");
+      if (mode === "dark") {
+        bodyEl.classList.add("quarto-dark");
+        bodyEl.classList.remove("quarto-light");
+      } else {
+        bodyEl.classList.add("quarto-light");
+        bodyEl.classList.remove("quarto-dark");
+      }
+    }
+    const toggleBodyColorPrimary = () => {
+      const bsSheetEl = window.document.querySelector("link#quarto-bootstrap:not([rel=disabled-stylesheet])");
+      if (bsSheetEl) {
+        toggleBodyColorMode(bsSheetEl);
+      }
+    }
+    const setColorSchemeToggle = (alternate) => {
+      const toggles = window.document.querySelectorAll('.quarto-color-scheme-toggle');
+      for (let i=0; i < toggles.length; i++) {
+        const toggle = toggles[i];
+        if (toggle) {
+          if (alternate) {
+            toggle.classList.add("alternate");
+          } else {
+            toggle.classList.remove("alternate");
+          }
+        }
+      }
+    };
+    const toggleColorMode = (alternate) => {
+      // Switch the stylesheets
+      const primaryStylesheets = window.document.querySelectorAll('link.quarto-color-scheme:not(.quarto-color-alternate)');
+      const alternateStylesheets = window.document.querySelectorAll('link.quarto-color-scheme.quarto-color-alternate');
+      manageTransitions('#quarto-margin-sidebar .nav-link', false);
+      if (alternate) {
+        // note: dark is layered on light, we don't disable primary!
+        enableStylesheet(alternateStylesheets);
+        for (const sheetNode of alternateStylesheets) {
+          if (sheetNode.id === "quarto-bootstrap") {
+            toggleBodyColorMode(sheetNode);
+          }
+        }
+      } else {
+        disableStylesheet(alternateStylesheets);
+        enableStylesheet(primaryStylesheets)
+        toggleBodyColorPrimary();
+      }
+      manageTransitions('#quarto-margin-sidebar .nav-link', true);
+      // Switch the toggles
+      setColorSchemeToggle(alternate)
+      // Hack to workaround the fact that safari doesn't
+      // properly recolor the scrollbar when toggling (#1455)
+      if (navigator.userAgent.indexOf('Safari') > 0 && navigator.userAgent.indexOf('Chrome') == -1) {
+        manageTransitions("body", false);
+        window.scrollTo(0, 1);
+        setTimeout(() => {
+          window.scrollTo(0, 0);
+          manageTransitions("body", true);
+        }, 40);
+      }
+    }
+    const disableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        stylesheet.rel = 'disabled-stylesheet';
+      }
+    }
+    const enableStylesheet = (stylesheets) => {
+      for (let i=0; i < stylesheets.length; i++) {
+        const stylesheet = stylesheets[i];
+        if(stylesheet.rel !== 'stylesheet') { // for Chrome, which will still FOUC without this check
+          stylesheet.rel = 'stylesheet';
+        }
+      }
+    }
+    const manageTransitions = (selector, allowTransitions) => {
+      const els = window.document.querySelectorAll(selector);
+      for (let i=0; i < els.length; i++) {
+        const el = els[i];
+        if (allowTransitions) {
+          el.classList.remove('notransition');
+        } else {
+          el.classList.add('notransition');
+        }
+      }
+    }
+    const isFileUrl = () => {
+      return window.location.protocol === 'file:';
+    }
+    const hasAlternateSentinel = () => {
+      let styleSentinel = getColorSchemeSentinel();
+      if (styleSentinel !== null) {
+        return styleSentinel === "alternate";
+      } else {
+        return false;
+      }
+    }
+    const setStyleSentinel = (alternate) => {
+      const value = alternate ? "alternate" : "default";
+      if (!isFileUrl()) {
+        window.localStorage.setItem("quarto-color-scheme", value);
+      } else {
+        localAlternateSentinel = value;
+      }
+    }
+    const getColorSchemeSentinel = () => {
+      if (!isFileUrl()) {
+        const storageValue = window.localStorage.getItem("quarto-color-scheme");
+        return storageValue != null ? storageValue : localAlternateSentinel;
+      } else {
+        return localAlternateSentinel;
+      }
+    }
+    const toggleGiscusIfUsed = (isAlternate, darkModeDefault) => {
+      const baseTheme = document.querySelector('#giscus-base-theme')?.value ?? 'light';
+      const alternateTheme = document.querySelector('#giscus-alt-theme')?.value ?? 'dark';
+      let newTheme = '';
+      if(authorPrefersDark) {
+        newTheme = isAlternate ? baseTheme : alternateTheme;
+      } else {
+        newTheme = isAlternate ? alternateTheme : baseTheme;
+      }
+      const changeGiscusTheme = () => {
+        // From: https://github.com/giscus/giscus/issues/336
+        const sendMessage = (message) => {
+          const iframe = document.querySelector('iframe.giscus-frame');
+          if (!iframe) return;
+          iframe.contentWindow.postMessage({ giscus: message }, 'https://giscus.app');
+        }
+        sendMessage({
+          setConfig: {
+            theme: newTheme
+          }
+        });
+      }
+      const isGiscussLoaded = window.document.querySelector('iframe.giscus-frame') !== null;
+      if (isGiscussLoaded) {
+        changeGiscusTheme();
+      }
+    };
+    const authorPrefersDark = true;
+    const darkModeDefault = authorPrefersDark;
+    let localAlternateSentinel = darkModeDefault ? 'alternate' : 'default';
+    // Dark / light mode switch
+    window.quartoToggleColorScheme = () => {
+      // Read the current dark / light value
+      let toAlternate = !hasAlternateSentinel();
+      toggleColorMode(toAlternate);
+      setStyleSentinel(toAlternate);
+      toggleGiscusIfUsed(toAlternate, darkModeDefault);
+      window.dispatchEvent(new Event('resize'));
+    };
+    // Switch to dark mode if need be
+    if (hasAlternateSentinel()) {
+      toggleColorMode(true);
+    } else {
+      toggleColorMode(false);
+    }
+  </script>
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="../sections/ch3_research_outline.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Research Outline</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-full">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="../">Advanced Power System Analysis</a> 
+        <div class="sidebar-tools-main">
+  <a href="" class="quarto-color-scheme-toggle quarto-navigation-tool  px-1" onclick="window.quartoToggleColorScheme(); return false;" title="Toggle dark mode"><i class="bi"></i></a>
+</div>
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Homepage</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch1_intro.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Introduction</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch2_gan_low_lit_review.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Literature Review</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch2_eqautions_derivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">DistFlow Equations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch3_research_outline.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Research Outline</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch4_initial_testing.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Testing Setup</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch5_first_rq.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Adressing first RQ</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../sections/ch6_inverter_reactive_power_derivation.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Equations Derivation for Inverter Reactive Power</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="../references.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">References</span></a>
+  </div>
+</li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#state-of-the-art" id="toc-state-of-the-art" class="nav-link active" data-scroll-target="#state-of-the-art"><span class="header-section-number">5.1</span> State of the Art</a></li>
+  <li><a href="#research-gap" id="toc-research-gap" class="nav-link" data-scroll-target="#research-gap"><span class="header-section-number">5.2</span> Research Gap</a></li>
+  <li><a href="#research-goal" id="toc-research-goal" class="nav-link" data-scroll-target="#research-goal"><span class="header-section-number">5.3</span> Research Goal</a></li>
+  <li><a href="#research-objectives" id="toc-research-objectives" class="nav-link" data-scroll-target="#research-objectives"><span class="header-section-number">5.4</span> Research Objectives</a></li>
+  <li><a href="#research-questions" id="toc-research-questions" class="nav-link" data-scroll-target="#research-questions"><span class="header-section-number">5.5</span> Research Questions</a></li>
+  <li><a href="#scope-and-assumptions" id="toc-scope-and-assumptions" class="nav-link" data-scroll-target="#scope-and-assumptions"><span class="header-section-number">5.6</span> Scope and Assumptions</a></li>
+  <li><a href="#expected-contributions" id="toc-expected-contributions" class="nav-link" data-scroll-target="#expected-contributions"><span class="header-section-number">5.7</span> Expected Contributions</a></li>
+  <li><a href="#references" id="toc-references" class="nav-link" data-scroll-target="#references"><span class="header-section-number">5.8</span> References</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content column-body" id="quarto-document-content">
+
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Motivation</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta column-body">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Distribution voltage is conventionally held near nominal along the primary feeder, typically within ±5%, so that every customer receives a service voltage inside ANSI C84.1 Range A (114–126 V). The limit, however, applies at the customer service point, not on the primary. If residential inverters can correct the voltage locally at each household, the primary feeder voltage no longer has to be chosen to protect the worst-placed customer. It becomes a decision variable: it can be lowered for conservation voltage reduction (CVR) or raised to reduce losses, while inverters hold each household within its service limit.</p>
+<section id="state-of-the-art" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="state-of-the-art"><span class="header-section-number">5.1</span> State of the Art</h2>
+<ul>
+<li><strong>CVR with smart inverters.</strong> Smart inverters have been coordinated with tap changers, regulators and capacitors to achieve CVR on three-phase unbalanced feeders <span class="citation" data-cites="jha2019bilevel zhang2019distributed">(<a href="../references.html#ref-jha2019bilevel" role="doc-biblioref"><strong>jha2019bilevel?</strong></a>; <a href="../references.html#ref-zhang2019distributed" role="doc-biblioref"><strong>zhang2019distributed?</strong></a>)</span>, including integrated primary-secondary networks with voltage-dependent loads <span class="citation" data-cites="zhang2021primarysecondary">(<a href="../references.html#ref-zhang2021primarysecondary" role="doc-biblioref"><strong>zhang2021primarysecondary?</strong></a>)</span>. In these studies inverters <em>support</em> CVR, while the primary voltage stays within its conventional band.</li>
+<li><strong>Grid-edge voltage control.</strong> Dedicated utility-owned devices on the secondary side of service transformers regulate customer voltage so that the primary can be lowered further. Field deployments report up to 5% CVR <span class="citation" data-cites="moghe2016gridedge">(<a href="../references.html#ref-moghe2016gridedge" role="doc-biblioref"><strong>moghe2016gridedge?</strong></a>)</span>, limiting-node voltage increases of 0.88–2.04% <span class="citation" data-cites="jha2023gridedge">(<a href="../references.html#ref-jha2023gridedge" role="doc-biblioref"><strong>jha2023gridedge?</strong></a>)</span>, and energy savings up to 4.7% when combined with smart inverters <span class="citation" data-cites="padullaparti2023cvr">(<a href="../references.html#ref-padullaparti2023cvr" role="doc-biblioref"><strong>padullaparti2023cvr?</strong></a>)</span>.</li>
+<li><strong>Volt-VAR curve design.</strong> Per-inverter Volt-VAR rules have been optimized for single-phase feeders <span class="citation" data-cites="murzakhanov2024optimal">(<a href="../references.html#ref-murzakhanov2024optimal" role="doc-biblioref"><strong>murzakhanov2024optimal?</strong></a>)</span>, unbalanced multiphase feeders <span class="citation" data-cites="gupta2025regulating">(<a href="../references.html#ref-gupta2025regulating" role="doc-biblioref"><strong>gupta2025regulating?</strong></a>)</span>, and a single utility-scale battery <span class="citation" data-cites="ingebrigtsen2026optimizing">(<a href="../references.html#ref-ingebrigtsen2026optimizing" role="doc-biblioref"><strong>ingebrigtsen2026optimizing?</strong></a>)</span>. All aim to keep voltages near nominal rather than to compensate a deliberately shifted primary.</li>
+<li><strong>Cross-phase coupling.</strong> On unbalanced four-wire networks, reactive power injected on one phase changes the voltages on the other phases <span class="citation" data-cites="wang2020interphase dalal2024crossphase">(<a href="../references.html#ref-wang2020interphase" role="doc-biblioref"><strong>wang2020interphase?</strong></a>; <a href="../references.html#ref-dalal2024crossphase" role="doc-biblioref"><strong>dalal2024crossphase?</strong></a>)</span>.</li>
+<li><strong>Siting and sizing.</strong> Methods exist to choose how many voltage-support units are needed and where, but for balanced networks <span class="citation" data-cites="giannitrapani2017optimal">(<a href="../references.html#ref-giannitrapani2017optimal" role="doc-biblioref"><strong>giannitrapani2017optimal?</strong></a>)</span> or PV at medium voltage <span class="citation" data-cites="chen2022optimal">(<a href="../references.html#ref-chen2022optimal" role="doc-biblioref"><strong>chen2022optimal?</strong></a>)</span>.</li>
+</ul>
+</section>
+<section id="research-gap" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="research-gap"><span class="header-section-number">5.2</span> Research Gap</h2>
+<p>Existing work either regulates customer voltage at the grid edge with dedicated utility devices, or uses residential inverters as auxiliary support while the primary voltage remains within its conventional band. No study has treated the primary feeder voltage as a free decision variable whose feasible range is set by the corrective capability of customer-owned residential inverters.</p>
+<p>In particular, it is not known:</p>
+<ol type="1">
+<li>how far the primary voltage can be shifted, up or down, before participating inverters can no longer hold every household within its service-voltage limit;</li>
+<li>how this range depends on the number, location and phase of participating inverters, and how it is reduced by cross-phase coupling, non-participating customers and battery operating state on unbalanced feeders;</li>
+<li>whether the energy saved by operating the primary away from nominal outweighs the additional losses caused by the reactive power needed to compensate it; and</li>
+<li>whether the required compensation can be delivered autonomously through location-dependent Volt-VAR settings.</li>
+</ol>
+<p>We define the <strong>decoupling range</strong> as the set of primary-side voltage set-points for which the participating inverters can keep every household service voltage within its target limits.</p>
+</section>
+<section id="research-goal" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="research-goal"><span class="header-section-number">5.3</span> Research Goal</h2>
+<p>To develop and evaluate a methodology for inverter-enabled grid-edge voltage regulation, in which residential inverters compensate their local service voltage so that the primary feeder voltage can be decoupled from customer voltage limits on unbalanced distribution networks.</p>
+</section>
+<section id="research-objectives" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="research-objectives"><span class="header-section-number">5.4</span> Research Objectives</h2>
+<ul>
+<li><strong>O1 — Quantify the decoupling range.</strong> Develop a sensitivity-based model that determines the decoupling range as a function of inverter count, location, phase assignment and rating.</li>
+<li><strong>O2 — Identify the limiting factors.</strong> Characterize how cross-phase coupling, non-participating customers and battery operating state (charging, discharging, idle) narrow or extend the decoupling range.</li>
+<li><strong>O3 — Evaluate the net benefit.</strong> Determine the primary voltage set-point that maximizes net benefit across loading conditions, accounting for voltage-dependent load reduction, additional network losses, transformer loading and substation power factor.</li>
+<li><strong>O4 — Enable decentralized implementation.</strong> Translate the required reactive power into location-dependent Volt-VAR settings (reference voltage, deadband, slope and reactive limits). Identify when autonomous operation is sufficient and when coordination is needed.</li>
+</ul>
+</section>
+<section id="research-questions" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="research-questions"><span class="header-section-number">5.5</span> Research Questions</h2>
+<p><strong>RQ1 — Decoupling feasibility:</strong> For a given set of residential inverters, what range of primary voltage set-points can be supported while keeping every household within its target service voltage, and how does this range scale with inverter count, location, phase assignment and rating?</p>
+<p><strong>RQ2 — Limiting factors:</strong> How do cross-phase coupling, non-participating customers and battery operating state constrain the decoupling range on unbalanced feeders?</p>
+<p><strong>RQ3 — Net benefit:</strong> Within the feasible range, which primary voltage set-point maximizes net energy benefit, after netting voltage-dependent load reduction against additional losses, and how does this optimum change with loading?</p>
+<p><strong>RQ4 — Decentralized implementation:</strong> Can the reactive power required at each location be encoded in Volt-VAR curves that hold household voltages at their targets without communication, and under what conditions does coordination become necessary?</p>
+</section>
+<section id="scope-and-assumptions" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="scope-and-assumptions"><span class="header-section-number">5.6</span> Scope and Assumptions</h2>
+<ul>
+<li>Unbalanced three-phase feeders with service transformers and single-phase residential connections. <em>To decide: test feeder (e.g., IEEE 8500-node or a PNNL taxonomy feeder) and whether secondaries are modelled as split-phase.</em></li>
+<li>Customer-owned single-phase residential inverters (PV and battery) with reactive capability limited by IEEE 1547-2018.</li>
+<li>Voltage-dependent load models (ZIP or CVR factor), since CVR savings depend directly on them.</li>
+<li>Quasi-static time-series simulation over representative loading conditions.</li>
+</ul>
+</section>
+<section id="expected-contributions" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="expected-contributions"><span class="header-section-number">5.7</span> Expected Contributions</h2>
+<ol type="1">
+<li>The concept and quantification of a <strong>decoupling range</strong> for inverter-enabled grid-edge voltage regulation, and its dependence on inverter participation, location and phase.</li>
+<li>An analysis of how <strong>cross-phase coupling and battery operating state</strong> limit grid-edge compensation on unbalanced feeders.</li>
+<li>A <strong>net-benefit assessment</strong> identifying when shifting the primary voltage is worthwhile once added losses are included.</li>
+<li>A method for deriving <strong>location-dependent Volt-VAR settings</strong> that implement the approach autonomously. Volt-VAR curves are the implementation of the methodology, not its primary objective.</li>
+</ol>
+</section>
+<section id="references" class="level2" data-number="5.8">
+<h2 data-number="5.8" class="anchored" data-anchor-id="references"><span class="header-section-number">5.8</span> References</h2>
+<ul>
+<li>jha2019bilevel — Jha, Dubey et al., “Bi-Level Volt-VAR Optimization to Coordinate Smart Inverters With Voltage Control Devices,” IEEE Trans. Power Syst., 2019. doi:10.1109/tpwrs.2018.2890613</li>
+<li>zhang2019distributed — Zhang, Dehghanpour and Wang, “Distributed CVR in Unbalanced Distribution Systems With PV Penetration,” IEEE Trans. Smart Grid, 2019. doi:10.1109/tsg.2018.2880419</li>
+<li>zhang2021primarysecondary — Zhang, Guo et al., “Distributed Optimal Conservation Voltage Reduction in Integrated Primary-Secondary Distribution Systems,” IEEE Trans. Smart Grid, 2021. doi:10.1109/tsg.2021.3088010</li>
+<li>moghe2016gridedge — Moghe, Tholomier et al., “Grid Edge Control: A new approach for volt-var optimization,” IEEE PES T&amp;D, 2016. doi:10.1109/tdc.2016.7519895</li>
+<li>jha2023gridedge — Jha, Fan et al., “Enhancing Conservation Voltage Reduction with Grid Edge Volt-VAr Control,” IEEE Grid Edge, 2023. doi:10.1109/gridedge54130.2023.10102726</li>
+<li>padullaparti2023cvr — Padullaparti, Baggu et al., “Conservation Voltage Reduction with Distributed Energy Resource Management System, Grid-Edge, and Legacy Devices,” IEEE PESGM, 2023. doi:10.1109/pesgm52003.2023.10252669</li>
+<li>murzakhanov2024optimal — Murzakhanov, Gupta, Chatzivasileiadis and Kekatos, “Optimal Design of Volt/VAR Control Rules for Inverter-Interfaced Distributed Energy Resources,” IEEE Trans. Smart Grid, 2024. doi:10.1109/TSG.2023.3279982</li>
+<li>gupta2025regulating — Gupta et al., “Regulating Voltage Magnitude and Phase Imbalance using DERs via Volt/VAR Control Rules,” IEEE PowerTech, 2025. <em>(DOI to confirm)</em></li>
+<li>ingebrigtsen2026optimizing — Ingebrigtsen, Bordin, Chiesa and Bakkejord, “Optimizing and implementing Volt-Var control in battery storage systems for voltage regulation in remote distribution networks,” Discover Applied Sciences, 2026. doi:10.1007/s42452-025-08069-9</li>
+<li>wang2020interphase — Wang et al., “A Distributed Inter-Phase Coordination Algorithm for Voltage Control With Unbalanced PV Integration in LV Systems,” IEEE Trans. Sustain. Energy, 2020. doi:10.1109/tste.2020.2970214</li>
+<li>dalal2024crossphase — Dalal et al., “Analyzing Cross-Phase Effects of Reactive Power Intervention on Distribution Voltage Control,” IEEE PESGM, 2024. <em>(DOI to confirm)</em></li>
+<li>giannitrapani2017optimal — Giannitrapani, Paoletti, Vicino and Zarrilli, “Optimal Allocation of Energy Storage Systems for Voltage Control in LV Distribution Networks,” IEEE Trans. Smart Grid, 2017. doi:10.1109/TSG.2016.2602480</li>
+<li>chen2022optimal — Chen et al., “Optimal Placement of PV Smart Inverters With Volt-VAr Control,” IEEE Systems Journal, 2022. <em>(DOI to confirm)</em></li>
+</ul>
+
+
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    // Ensure there is a toggle, if there isn't float one in the top right
+    if (window.document.querySelector('.quarto-color-scheme-toggle') === null) {
+      const a = window.document.createElement('a');
+      a.classList.add('top-right');
+      a.classList.add('quarto-color-scheme-toggle');
+      a.href = "";
+      a.onclick = function() { try { window.quartoToggleColorScheme(); } catch {} return false; };
+      const i = window.document.createElement("i");
+      i.classList.add('bi');
+      a.appendChild(i);
+      window.document.body.appendChild(a);
+    }
+    setColorSchemeToggle(hasAlternateSentinel())
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+            // target, if specified
+            link.setAttribute("target", "_blank");
+            if (link.getAttribute("rel") === null) {
+              link.setAttribute("rel", "noopener");
+            }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation column-body">
+  <div class="nav-page nav-page-previous">
+      <a href="../sections/ch2_eqautions_derivation.html" class="pagination-link" aria-label="DistFlow Equations">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">DistFlow Equations</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="../sections/ch4_initial_testing.html" class="pagination-link" aria-label="Testing Setup">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Testing Setup</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+<script src="../site_libs/quarto-html/zenscroll-min.js"></script>
+</body></html>

@@ -1,0 +1,1619 @@
+
+
+
+module tape;
+module generators;
+module powerflow {
+    solver_method NR;
+};
+clock {
+    timezone US/OR/Portland;
+    timestamp '2025-09-01 00:00:00';
+    stoptime '2025-09-01 23:59:00';
+}
+
+object node {
+    name upstream_source;
+    bustype SWING;
+    phases AN;
+    nominal_voltage 2400;
+    voltage_A 2400+0j;
+}
+
+
+object overhead_line_conductor {
+    name OH100;
+    geometric_mean_radius 0.0244;
+    resistance 0.306;
+}
+object overhead_line_conductor {
+    name OH101;
+    geometric_mean_radius 0.00814;
+    resistance 0.592;
+}
+object line_spacing {
+    name LS200;
+    distance_AB 2.5;
+    distance_BC 4.5;
+    distance_AC 7.0;
+    distance_AN 5.656854;
+    distance_BN 4.272002;
+    distance_CN 5.0;
+}
+
+
+object line_configuration {
+    name LC300;
+    conductor_A OH100;
+    conductor_B OH100;
+    conductor_C OH100;
+    conductor_N OH101;
+    spacing LS200;
+}
+object overhead_line {
+    name upstream_line;
+    phases AN;
+    from upstream_source;
+    to Node4;
+    length 1000 ft;
+    configuration LC300;
+}
+object node {
+    name Node4;
+    phases AN;
+    nominal_voltage 2400;
+}
+
+
+
+object transformer_configuration {
+    name PoleTop;
+    connect_type SINGLE_PHASE_CENTER_TAPPED;
+    install_type POLETOP;
+    power_rating 50;
+    powerA_rating 50;
+    primary_voltage 2400;
+    secondary_voltage 120;
+    resistance 0.01;
+    reactance 0.06;
+}
+object transformer {
+    name split_boi;
+    phases AS;
+    from Node4;
+    to mr_meter1;
+    configuration PoleTop;
+}
+object triplex_meter {
+    name mr_meter1;
+    phases AS;
+    nominal_voltage 120;
+}
+
+
+object triplex_line_conductor {
+    name Name_1_0_AA_triplex;
+    resistance 0.57;
+    geometric_mean_radius 0.0111;
+}
+object triplex_line_configuration {
+    name triplex_line_config;
+    conductor_1 Name_1_0_AA_triplex;
+    conductor_2 Name_1_0_AA_triplex;
+    conductor_N Name_1_0_AA_triplex;
+    insulation_thickness 0.1;
+    diameter 0.4;
+}
+
+
+
+
+
+
+
+object triplex_node {
+    name tap_1;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_1;
+    phases AS;
+    from mr_meter1;
+    to tap_1;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_1;
+    phases AS;
+    from tap_1;
+    to house_1;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_1;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_1_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_1.csv";
+    };
+}
+object recorder {
+    name house_1_voltage_recorder;
+    parent house_1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_1_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_2;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_2;
+    phases AS;
+    from tap_1;
+    to tap_2;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_2;
+    phases AS;
+    from tap_2;
+    to house_2;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_2;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_2_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_2.csv";
+    };
+}
+object recorder {
+    name house_2_voltage_recorder;
+    parent house_2;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_2_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_3;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_3;
+    phases AS;
+    from tap_2;
+    to tap_3;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_3;
+    phases AS;
+    from tap_3;
+    to house_3;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_3;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_3_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_3.csv";
+    };
+}
+object recorder {
+    name house_3_voltage_recorder;
+    parent house_3;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_3_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_4;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_4;
+    phases AS;
+    from tap_3;
+    to tap_4;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_4;
+    phases AS;
+    from tap_4;
+    to house_4;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_4;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_4_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_4.csv";
+    };
+}
+object recorder {
+    name house_4_voltage_recorder;
+    parent house_4;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_4_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_5;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_5;
+    phases AS;
+    from tap_4;
+    to tap_5;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_5;
+    phases AS;
+    from tap_5;
+    to house_5;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_5;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_5_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_5.csv";
+    };
+}
+object recorder {
+    name house_5_voltage_recorder;
+    parent house_5;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_5_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_6;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_6;
+    phases AS;
+    from tap_5;
+    to tap_6;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_6;
+    phases AS;
+    from tap_6;
+    to house_6;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_6;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_6_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_6.csv";
+    };
+}
+object recorder {
+    name house_6_voltage_recorder;
+    parent house_6;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_6_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_7;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_7;
+    phases AS;
+    from tap_6;
+    to tap_7;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_7;
+    phases AS;
+    from tap_7;
+    to house_7;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_7;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_7_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_7.csv";
+    };
+}
+object recorder {
+    name house_7_voltage_recorder;
+    parent house_7;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_7_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_8;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_8;
+    phases AS;
+    from tap_7;
+    to tap_8;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_8;
+    phases AS;
+    from tap_8;
+    to house_8;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_8;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_8_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_8.csv";
+    };
+}
+object recorder {
+    name house_8_voltage_recorder;
+    parent house_8;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_8_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_9;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_9;
+    phases AS;
+    from tap_8;
+    to tap_9;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_9;
+    phases AS;
+    from tap_9;
+    to house_9;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_9;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_9_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_9.csv";
+    };
+}
+object recorder {
+    name house_9_voltage_recorder;
+    parent house_9;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_9_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_10;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_10;
+    phases AS;
+    from tap_9;
+    to tap_10;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_10;
+    phases AS;
+    from tap_10;
+    to house_10;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_10;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_10_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_10.csv";
+    };
+}
+object recorder {
+    name house_10_voltage_recorder;
+    parent house_10;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_10_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_11;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_11;
+    phases AS;
+    from tap_10;
+    to tap_11;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_11;
+    phases AS;
+    from tap_11;
+    to house_11;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_11;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_11_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_11.csv";
+    };
+}
+object recorder {
+    name house_11_voltage_recorder;
+    parent house_11;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_11_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_12;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_12;
+    phases AS;
+    from tap_11;
+    to tap_12;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_12;
+    phases AS;
+    from tap_12;
+    to house_12;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_12;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_12_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_12.csv";
+    };
+}
+object recorder {
+    name house_12_voltage_recorder;
+    parent house_12;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_12_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_13;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_13;
+    phases AS;
+    from tap_12;
+    to tap_13;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_13;
+    phases AS;
+    from tap_13;
+    to house_13;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_13;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_13_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_13.csv";
+    };
+}
+object recorder {
+    name house_13_voltage_recorder;
+    parent house_13;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_13_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_14;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_14;
+    phases AS;
+    from tap_13;
+    to tap_14;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_14;
+    phases AS;
+    from tap_14;
+    to house_14;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_14;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_14_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_14.csv";
+    };
+}
+object recorder {
+    name house_14_voltage_recorder;
+    parent house_14;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_14_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_15;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_15;
+    phases AS;
+    from tap_14;
+    to tap_15;
+    length 100 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_15;
+    phases AS;
+    from tap_15;
+    to house_15;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_15;
+    phases AS;
+    nominal_voltage 120;
+    object player {
+        name house_15_profile;
+        property constant_power_12;
+        file "/home/midrar/projects/adaptive_vvo/gld/datasets/scaled_1p5/house_profile_15.csv";
+    };
+}
+object recorder {
+    name house_15_voltage_recorder;
+    parent house_15;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/house_15_voltage.csv";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+object recorder {
+    name rec;
+    parent mr_meter1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/voltage_a.csv";
+}
+object recorder {
+    name service_power_recorder;
+    parent mr_meter1;
+    property measured_real_power,measured_reactive_power;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/service_power.csv";
+}
+object recorder {
+    name node4_voltage_recorder;
+    parent Node4;
+    property voltage_A;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/node4_voltage.csv";
+}
+
+object triplex_meter { name bess_meter_1; parent house_1; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_1; parent bess_meter_1; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_1.csv"; };
+}
+object battery {
+    name battery_1; parent inverter_1;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_1; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_1.csv";
+}
+
+object triplex_meter { name bess_meter_2; parent house_2; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_2; parent bess_meter_2; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_2.csv"; };
+}
+object battery {
+    name battery_2; parent inverter_2;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_2; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_2.csv";
+}
+
+object triplex_meter { name bess_meter_3; parent house_3; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_3; parent bess_meter_3; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_3.csv"; };
+}
+object battery {
+    name battery_3; parent inverter_3;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_3; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_3.csv";
+}
+
+object triplex_meter { name bess_meter_4; parent house_4; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_4; parent bess_meter_4; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_4.csv"; };
+}
+object battery {
+    name battery_4; parent inverter_4;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_4; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_4.csv";
+}
+
+object triplex_meter { name bess_meter_5; parent house_5; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_5; parent bess_meter_5; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_5.csv"; };
+}
+object battery {
+    name battery_5; parent inverter_5;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_5; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_5.csv";
+}
+
+object triplex_meter { name bess_meter_6; parent house_6; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_6; parent bess_meter_6; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_6.csv"; };
+}
+object battery {
+    name battery_6; parent inverter_6;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_6; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_6.csv";
+}
+
+object triplex_meter { name bess_meter_7; parent house_7; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_7; parent bess_meter_7; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_7.csv"; };
+}
+object battery {
+    name battery_7; parent inverter_7;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_7; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_7.csv";
+}
+
+object triplex_meter { name bess_meter_8; parent house_8; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_8; parent bess_meter_8; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_8.csv"; };
+}
+object battery {
+    name battery_8; parent inverter_8;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_8; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_8.csv";
+}
+
+object triplex_meter { name bess_meter_9; parent house_9; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_9; parent bess_meter_9; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_9.csv"; };
+}
+object battery {
+    name battery_9; parent inverter_9;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_9; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_9.csv";
+}
+
+object triplex_meter { name bess_meter_10; parent house_10; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_10; parent bess_meter_10; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_10.csv"; };
+}
+object battery {
+    name battery_10; parent inverter_10;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_10; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_10.csv";
+}
+
+object triplex_meter { name bess_meter_11; parent house_11; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_11; parent bess_meter_11; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_11.csv"; };
+}
+object battery {
+    name battery_11; parent inverter_11;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_11; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_11.csv";
+}
+
+object triplex_meter { name bess_meter_12; parent house_12; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_12; parent bess_meter_12; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_12.csv"; };
+}
+object battery {
+    name battery_12; parent inverter_12;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_12; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_12.csv";
+}
+
+object triplex_meter { name bess_meter_13; parent house_13; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_13; parent bess_meter_13; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_13.csv"; };
+}
+object battery {
+    name battery_13; parent inverter_13;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_13; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_13.csv";
+}
+
+object triplex_meter { name bess_meter_14; parent house_14; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_14; parent bess_meter_14; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_14.csv"; };
+}
+object battery {
+    name battery_14; parent inverter_14;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_14; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_14.csv";
+}
+
+object triplex_meter { name bess_meter_15; parent house_15; phases AS; nominal_voltage 120; }
+object inverter {
+    name inverter_15; parent bess_meter_15; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out 0;
+    object player { property Q_Out; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/q_house_15.csv"; };
+}
+object battery {
+    name battery_15; parent inverter_15;
+    use_internal_battery_model TRUE; battery_type LI_ION;
+    generator_mode SUPPLY_DRIVEN; nominal_voltage 400; rated_power 5000;
+    battery_capacity 10000; state_of_charge 0.5; round_trip_efficiency 0.90;
+}
+object recorder {
+    parent inverter_15; property P_Out,Q_Out,VA_Out;
+    interval 60; file "/home/midrar/projects/adaptive_vvo/gld/results/all_house_inverters/inverter_15.csv";
+}

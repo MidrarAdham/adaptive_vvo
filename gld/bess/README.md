@@ -41,3 +41,21 @@ and primary/head recorder files remain available. Figures are
 `gld/figures/house15_bess_control.svg` and `.png`, including upstream changes.
 The supplied GLM runs with the last computed schedule; rerun the Python script
 after changing loads or circuit parameters to recompute dispatch.
+
+## Reactive-power sensitivity at 20:46
+
+Run `poetry run python gld/sweep_house15_q.py` from the repository root.
+It creates 11 independent cases from -5 to +5 kvar in 1 kvar steps, preserving
+the upstream line and the original fixed upstream source. Each enabled house
+load is frozen at its exact 2025-09-01 20:46:00 PDT profile value; demand players
+and the inverter Q schedule are replaced by constant setpoints in generated
+copies. The original BESS and base-case GLMs are unchanged. Actual inverter
+VA_Out is checked against commanded Q, zero P, and the 5 kVA limit.
+
+Case models, logs and recorder CSVs are in `gld/results/house15_q_sweep/`.
+`summary.csv` contains house-15, transformer-secondary and primary voltages;
+`house_voltages.csv` contains both legs at every house. The figure is
+`gld/figures/house15_q_sweep.svg` (also PNG), with a copy in docs/figures_qmd.
+House 15 reaches 0.88639 pu at -5 kvar, 0.90454 pu at zero Q, and 0.92078 pu
+at +5 kvar. Positive Q injection raises voltage but cannot reach 1 pu at this
+operating point. This is a steady-state sensitivity sweep, not feedback control.

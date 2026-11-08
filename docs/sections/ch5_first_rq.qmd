@@ -1,0 +1,50 @@
+## Quantify the decoupling range.
+Develop a sensitivity-based model that determines the decoupling range as a function of inverter count, location, phase assignment and rating.
+
+## Setup
+
+1. Calibrate the base case. At a Node 4 voltage of 1.00 pu and the worst hour (20:46), the last house should sit between 0.95 and 0.97 pu. Adjust loading, secondary length or the conductor value until it does.
+
+2. Fix two operating points with frozen loads, as you did for Figure 6.5:
+
+    * **Heavy load (20:46):** sets the lower edge of the range, where houses hit 114 V.
+    * **Light load (the daily minimum):** sets the upper edge, where houses hit 126 V.
+
+3. Define “pass”: every house, both legs, between 0.95 and 1.05 pu.
+
+**Baseline: no inverter**
+
+4. Sweep the swing voltage from about 0.95 to 1.05 pu in small steps (0.005 pu).
+
+5. Record two numbers:
+    - the lowest primary voltage at which every house still passes at heavy load;
+    - the highest primary voltage at which every house still passes at light load.
+
+The band between them is the baseline range. It may be very narrow, or even empty.
+
+**One inverter**
+
+6. Add one 5 kVA inverter at house 15.
+    - **Heavy load:** inject +2.2 kvar, the IEEE 1547 limit of 44%.
+    - **Light load:** absorb −2.2 kvar.
+    - Also run $\pm$ 5 kvar as an upper bound.
+
+7. Repeat the sweep and record the new lowest and highest primary voltages.
+
+8. Decoupling range = new range − baseline range. Need to write it as one sentence: “With one 5 kVA inverter at house 15, the lower edge moves from X to Y pu.”
+
+9. Note which house is now the limit. Once house 15 is fixed, another house (for example 14 or 13) may become the one that fails first. This shows why one inverter is rarely enough.
+
+**Extend it**
+
+10. Location: move the single inverter from house 1 to house 15 and record the range at each position.
+
+11. Count: add inverters one at a time, farthest house first, from 1 to 15, and record the range each time.
+
+12. Rating: repeat step 7 with 3, 5, 7.6 and 10 kVA inverters.
+
+**Deliverables**
+
+* A table with one row per case (baseline, location, count, rating), giving the lower edge, upper edge and limiting house.
+
+* Three plots: range against location, range against count, and range against rating.
