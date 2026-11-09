@@ -48,3 +48,55 @@ The band between them is the baseline range. It may be very narrow, or even empt
 * A table with one row per case (baseline, location, count, rating), giving the lower edge, upper edge and limiting house.
 
 * Three plots: range against location, range against count, and range against rating.
+
+## Results
+
+Calibrate the base case. At a Node 4 voltage of 1.00 pu and the worst hour (20:46), the last house should sit between 0.95 and 0.97 pu. Adjust loading, secondary length or the conductor value until it does.
+
+
+```{python}
+#| echo: false
+#| message: false
+
+import os
+import pandas as pd
+from IPython.display import Markdown
+
+# Load data and convert to markdown format
+filepath = "../../gld/rq1/results/step1_calibration/summary.csv"
+df = pd.read_csv(filepath)
+Markdown(df.to_markdown(index=False))
+```
+***
+
+Fix two operating points with frozen loads, as you did for @fig-inverter-Q-sweep:
+Heavy load (20:46): sets the lower edge of the range, where houses hit 114 V.
+Light load (the daily minimum): sets the upper edge, where houses hit 126 V.
+
+***
+```{python}
+#| echo: false
+#| message: false
+
+import os
+import pandas as pd
+from IPython.display import Markdown
+
+# Load data and convert to markdown format
+filepath = "../../gld/rq1/results/step2_operating_points/house_voltages.csv"
+df = pd.read_csv(filepath)
+df = df.head(10)
+Markdown(df.to_markdown(index=False))
+```
+### Baseline: no inverter
+
+1. Sweep the swing voltage from about 0.95 to 1.05 pu in small steps (0.005 pu). Logging two numbers:
+
+    * the lowest primary voltage at which every house still passes at heavy load;
+    * the highest primary voltage at which every house still passes at light load.
+
+![Baseline Sweep with no inverters](../figures_qmd/baseline_sweep.svg){#fig-v-sweep-no-inv}
+
+@fig-v-sweep-no-inv shows the per unit house voltages on the y-axis and the per unit swing node voltages sweep. The sweep is intentional such that we change the voltages at the swing node from the 0.95 to 1.05 at 0.005 p.u. voltage step.
+
+As expected, house 15 (the furthest from the head of the line) has the lowest voltage drop. The blue line, as well as the shaded area, shows a heady load case, wherein the load profile is multiplied by 1.25\% of the original ResStock dataset. The orange line, on the other hand, shows a light load, wherein the demand profile is kept the same. The big rectangular shaded area is the $\pm$ 5\% region. This range is here for testing.

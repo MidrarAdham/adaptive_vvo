@@ -60,7 +60,3 @@ format:
     number-sections: true
   pdf:
     number-sections: true
-    include-in-header: 
-      text: |
-        \usepackage{nicematrix}
-        \usepackage{tikz}
