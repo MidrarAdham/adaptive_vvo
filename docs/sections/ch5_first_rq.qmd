@@ -100,3 +100,81 @@ Markdown(df.to_markdown(index=False))
 @fig-v-sweep-no-inv shows the per unit house voltages on the y-axis and the per unit swing node voltages sweep. The sweep is intentional such that we change the voltages at the swing node from the 0.95 to 1.05 at 0.005 p.u. voltage step.
 
 As expected, house 15 (the furthest from the head of the line) has the lowest voltage drop. The blue line, as well as the shaded area, shows a heady load case, wherein the load profile is multiplied by 1.25\% of the original ResStock dataset. The orange line, on the other hand, shows a light load, wherein the demand profile is kept the same. The big rectangular shaded area is the $\pm$ 5\% region. This range is here for testing.
+
+### Adding one inverter at house 15
+
+As per the IEEE 1547, the injection/consumption of $Q$ should be limited by 44\% of the inverter kVA. Given that our inverters are set to $7.6 KVA$, the proucing/consumption of $Q$ is limited to $3.34$ kVAr. So the maximum and minimum limits of the inverter are at $\pm 5\%$. An extreme case is where the inverter consume or absorb $Q$ at its full capacity.
+
+![Baseline Sweep with no inverters](../figures_qmd/one_inverter.svg){#fig-one-inverter}
+
+**Lower Edge:**
+The left top plot @fig-one-inverter shows the voltage at house 15 (y-axis) and the swing node voltage sweep. Note that this is a focused plot at the heaviest load period of the day. If we want to maintain the voltage at house 15 at 0.95 p.u., then we need to inject 3.344 kVAr at a swing node voltage at 0.9833. Without an inverter, the only case where the house 15 voltage remains at 0.95 is to set the swing node voltage at 0.9898 p.u. Finally, the house 15 voltage remains at the 0.95 p.u. spot, given that an inverter at house injecting Q at full capacity, occurs only when the swing node voltage at 0.9751 p.u.
+
+**Upper Edge**
+The lightest load period of the day occurs at the begining of the day. We are still looking at the swing node voltage and the house 15 voltage. At the base case, where no inverter is installed at house 15, the only way for the house 15 voltage to be at 1.05 p.u. is to set the swing node voltage at 1.0527 p.u. However, adding an inverter running at its $44\%$ of its capacity, and maintaing the house 15 voltage at 1.05 would need the swing node voltage to be at 1.0566 p.u. Finally, an inverter running at full Q capacity can maintain the voltage at house 15 at 1.05 only if the swing node is at 1.0617.
+
+All of these numbers describe the relationship between the voltage and Q, as a function of the distance between the inverter at which the house it was installed at.
+
+
+![Voltages at each house with one inverter at house 15](../figures_qmd/profiles.svg){#fig-v-profiles}
+
+@fig-v-profiles shows the same idea in @fig-one-inverter. We are trying to determine at what a swing node voltage can we maintain the house 15 between the lower and upper limits. However, in @fig-v-profiles, we see the voltages at all houses, not just house 15.
+
+Both plots hold the voltage upper and lower limits, $\pm 5\%$. The left plot shows the voltages at the heavy load period. In the basecase, where no inverter is installed at house 15, the voltage drop vs the distance has an alomst linear trend. Recall that the swing node voltage here is at its lowest edge for the basecase, $44\%$ KVA capacity, and inverter full kVA cpacity (0.9898, 0.9833, 0.9751, respectively). At these swing node p.u. values, the house 15 voltage is at 0.95 p.u. The question we are trying to answer here is:
+
+::: {.callout-note appearance="simple"}
+What are the voltages at the feeder taps (house voltages) when the swing node voltage is swept with or without inverters at weakest point of the feeder (the furthest point from the transformer)?
+:::
+
+The left plot shows the voltage at houses, $h\in\{1,2,3,\cdots,i\}$. The lowest voltage point that each house can get to is shown in the left plot. For instance, house 1 can get to 0.9898 p.u., and that's its lowest point (without inverter support). The same concept applies to the other houses. As we inject more $Q$ to the feeder, we have more room to change the swing node voltage. note that in the case where on inverter is installed at house 15 and injecting 3.344 VArs, the swing node voltage was able to drop from 0.9898 to 0.833. The same idea applies to the case where the inverter injects $Q$ at full capacity.
+
+
+The righ plot shows a similar trend, wherein the voltage at the nearest house to the swing node all the way to the end of the feeder. This figure focuses on the lightest load period during the 24 hours. Also note that at that time the inverters consume $Q$. As $Q$ increases, the swing node voltage as well as the house voltages have more range to adjust the voltage at. 
+
+It is interesting to note that the left plot shows that the voltages at houses 10, 11, 12, 13, and 14 are all close to the lower edge limit (left plot, 7.6 kVAr). House 15 is the only house that hits the limit ($0.95~p.u.$). it seems like a larger inverter would bring these houses down at the limit that we are aimin for, which where house 15 is at right now.
+
+> Location: move the single inverter from house 1 to house 15 and record the range at each position.
+
+![Sweeping the inverter location across houses](../figures_qmd/location.svg){#fig-inverter-sweeping}
+
+#### Heavy Load (Lower Edge)
+
+---
+
+The top figure shows what happens when moving the inverter from house 15 to house k, during the heavy load period. When an inverter is added in house 1, at $Q=44\%$ of its capacity, the per unit voltage drops by 0.0042 p.u.:
+
+With no inverter, the voltage at the swing node is:
+$$V_{p.u., basecase} = 0.9898$$
+
+Adding an inverter to house 1, the swing node voltage becomes:
+
+$$V_{p.u., 44\%} = 0.9856$$
+
+So the difference from the basecase ($\Delta V_{w/o~inv,~w~inv}$):
+$$\Delta V_{w/o~inv,~w~inv} = V_{w/o~inv} - V_{w/~inv}$$
+$$\Delta V_{w/o~inv,~w~inv} = 0.9898 - 0.9856 = 0.0042~p.u.$$
+
+With an inverter at house 15, the voltage at that house becomes $0.9833$, which provide a difference with the swing node:
+
+$$\Delta V_{w/o~inv,~w~inv} = 0.9898 - 0.9833 = 0.0065~p.u.$$
+
+With that in mind, the data shows that an inverter installed at house 1 does $65\%$ of what it does at house 15:
+
+$$\frac{0.0042}{0.0065} \times 100 \approx 65\% $$
+
+The voltage at each house decreases as we move the inverter to houses downstream, and the swing node voltage widens (increases), meaning that there is more room for the voltage to change at the swing node.
+
+#### Light Load (Upper Edge)
+In this case, the inverter absorbs reactive power, and the votlage at the swing node is $1.0527~p.u.$ (no inverter case). Installing an inverter at house 1 raises the voltage by:
+
+$$\Delta V_{w/o~inv,~w~inv} = \underbrace{1.0567}_{\text{house 1}}-\underbrace{1.0527}_{\text{basecase}}= 0.004~p.u. \leftarrow 44\% ~case$$
+
+$$\Delta V_{w/o~inv,~w~inv} = \underbrace{1.0566}_{\text{house 15}}-\underbrace{1.0527}_{\text{basecase}}= 0.0039~p.u. \leftarrow 44\% ~case$$
+
+So an inverter sitting at house 1 does $97\%$ of what it does in house 15.
+
+$$\frac{0.0039}{0.0040} \times 100 = 97.5\%$$
+
+::: {.callout-note appearance="simple"}
+Why is the line flat here? Need to run some calculations because I am not sure what is going on. The inverter only has an effect at house 1, nothing happens when I sweep the inverters locations at different houses. The line is flat.
+:::

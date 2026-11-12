@@ -5,3 +5,6 @@ references/
 *.log
 *.png
 *.svg
+*.html
+*.css
+*.pyc

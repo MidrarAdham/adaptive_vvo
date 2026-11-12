@@ -1264,12 +1264,12 @@ object inverter {
     name house15_inverter; parent house15_inv_meter; phases AS;
     generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
     inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
-    rated_power 5000; inverter_efficiency 0.96; P_Out 0; Q_Out -5000;
+    rated_power 7600; inverter_efficiency 0.96; P_Out 0; Q_Out -7600;
 }
 object battery {
     name house15_battery; parent house15_inverter;
     use_internal_battery_model TRUE; battery_type LI_ION; generator_mode SUPPLY_DRIVEN;
-    nominal_voltage 400; rated_power 5000; battery_capacity 10000; state_of_charge 0.5;
+    nominal_voltage 400; rated_power 7600; battery_capacity 10000; state_of_charge 0.5;
     round_trip_efficiency 0.90;
 }
 object recorder { parent house15_inverter; property P_Out,Q_Out,VA_Out; interval 60;

@@ -1,0 +1,1276 @@
+
+
+
+module tape;
+module generators;
+module powerflow {
+    solver_method NR;
+};
+clock {
+    timezone US/OR/Portland;
+    timestamp '2025-09-01 20:46:00';
+    stoptime '2025-09-01 20:47:00';
+}
+
+object overhead_line_conductor {
+    name OH100;
+    geometric_mean_radius 0.0244;
+    resistance 0.306;
+}
+object overhead_line_conductor {
+    name OH101;
+    geometric_mean_radius 0.00814;
+    resistance 0.592;
+}
+object line_spacing {
+    name LS200;
+    distance_AB 2.5;
+    distance_BC 4.5;
+    distance_AC 7.0;
+    distance_AN 5.656854;
+    distance_BN 4.272002;
+    distance_CN 5.0;
+}
+
+
+object line_configuration {
+    name LC300;
+    conductor_A OH100;
+    conductor_B OH100;
+    conductor_C OH100;
+    conductor_N OH101;
+    spacing LS200;
+}
+object node {
+    name Node4;
+    bustype SWING;
+    voltage_A 2388.00000000+0j;
+    phases AN;
+    nominal_voltage 2400;
+}
+
+
+
+object transformer_configuration {
+    name PoleTop;
+    connect_type SINGLE_PHASE_CENTER_TAPPED;
+    install_type POLETOP;
+    power_rating 50;
+    powerA_rating 50;
+    primary_voltage 2400;
+    secondary_voltage 120;
+    resistance 0.01;
+    reactance 0.06;
+}
+object transformer {
+    name split_boi;
+    phases AS;
+    from Node4;
+    to mr_meter1;
+    configuration PoleTop;
+}
+object triplex_meter {
+    name mr_meter1;
+    phases AS;
+    nominal_voltage 120;
+}
+
+
+object triplex_line_conductor {
+    name Name_1_0_AA_triplex;
+    resistance 0.57;
+    geometric_mean_radius 0.0111;
+}
+object triplex_line_configuration {
+    name triplex_line_config;
+    conductor_1 Name_1_0_AA_triplex;
+    conductor_2 Name_1_0_AA_triplex;
+    conductor_N Name_1_0_AA_triplex;
+    insulation_thickness 0.1;
+    diameter 0.4;
+}
+
+
+
+
+
+
+
+
+object triplex_node {
+    name tap_1;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_1;
+    phases AS;
+    from mr_meter1;
+    to tap_1;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_1;
+    phases AS;
+    from tap_1;
+    to house_1;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_1;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 683.518095788912+0j;
+}
+object recorder {
+    name house_1_voltage_recorder;
+    parent house_1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_1_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_2;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_2;
+    phases AS;
+    from tap_1;
+    to tap_2;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_2;
+    phases AS;
+    from tap_2;
+    to house_2;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_2;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 700.505709111309+0j;
+}
+object recorder {
+    name house_2_voltage_recorder;
+    parent house_2;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_2_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_3;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_3;
+    phases AS;
+    from tap_2;
+    to tap_3;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_3;
+    phases AS;
+    from tap_3;
+    to house_3;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_3;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 411.521761674021+0j;
+}
+object recorder {
+    name house_3_voltage_recorder;
+    parent house_3;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_3_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_4;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_4;
+    phases AS;
+    from tap_3;
+    to tap_4;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_4;
+    phases AS;
+    from tap_4;
+    to house_4;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_4;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 732.358537313291+0j;
+}
+object recorder {
+    name house_4_voltage_recorder;
+    parent house_4;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_4_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_5;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_5;
+    phases AS;
+    from tap_4;
+    to tap_5;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_5;
+    phases AS;
+    from tap_5;
+    to house_5;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_5;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 1364.44313937601+0j;
+}
+object recorder {
+    name house_5_voltage_recorder;
+    parent house_5;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_5_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_6;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_6;
+    phases AS;
+    from tap_5;
+    to tap_6;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_6;
+    phases AS;
+    from tap_6;
+    to house_6;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_6;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 1548.52270911767+0j;
+}
+object recorder {
+    name house_6_voltage_recorder;
+    parent house_6;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_6_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_7;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_7;
+    phases AS;
+    from tap_6;
+    to tap_7;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_7;
+    phases AS;
+    from tap_7;
+    to house_7;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_7;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 903.567562396217+0j;
+}
+object recorder {
+    name house_7_voltage_recorder;
+    parent house_7;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_7_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_8;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_8;
+    phases AS;
+    from tap_7;
+    to tap_8;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_8;
+    phases AS;
+    from tap_8;
+    to house_8;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_8;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 3775.07822860089+0j;
+}
+object recorder {
+    name house_8_voltage_recorder;
+    parent house_8;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_8_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_9;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_9;
+    phases AS;
+    from tap_8;
+    to tap_9;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_9;
+    phases AS;
+    from tap_9;
+    to house_9;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_9;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 613.453202598789+0j;
+}
+object recorder {
+    name house_9_voltage_recorder;
+    parent house_9;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_9_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_10;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_10;
+    phases AS;
+    from tap_9;
+    to tap_10;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_10;
+    phases AS;
+    from tap_10;
+    to house_10;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_10;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 592.131211680927+0j;
+}
+object recorder {
+    name house_10_voltage_recorder;
+    parent house_10;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_10_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_11;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_11;
+    phases AS;
+    from tap_10;
+    to tap_11;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_11;
+    phases AS;
+    from tap_11;
+    to house_11;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_11;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 638.111236660729+0j;
+}
+object recorder {
+    name house_11_voltage_recorder;
+    parent house_11;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_11_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_12;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_12;
+    phases AS;
+    from tap_11;
+    to tap_12;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_12;
+    phases AS;
+    from tap_12;
+    to house_12;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_12;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 1023.35945692453+0j;
+}
+object recorder {
+    name house_12_voltage_recorder;
+    parent house_12;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_12_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_13;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_13;
+    phases AS;
+    from tap_12;
+    to tap_13;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_13;
+    phases AS;
+    from tap_13;
+    to house_13;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_13;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 1164.45201297896+0j;
+}
+object recorder {
+    name house_13_voltage_recorder;
+    parent house_13;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_13_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_14;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_14;
+    phases AS;
+    from tap_13;
+    to tap_14;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_14;
+    phases AS;
+    from tap_14;
+    to house_14;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_14;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 845.624254388362+0j;
+}
+object recorder {
+    name house_14_voltage_recorder;
+    parent house_14;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_14_voltage.csv";
+}
+
+
+object triplex_node {
+    name tap_15;
+    phases AS;
+    nominal_voltage 120;
+}
+object triplex_line {
+    name main_15;
+    phases AS;
+    from tap_14;
+    to tap_15;
+    length 40 ft;
+    configuration triplex_line_config;
+}
+object triplex_line {
+    name service_15;
+    phases AS;
+    from tap_15;
+    to house_15;
+    length 30 ft;
+    configuration triplex_line_config;
+}
+object triplex_load {
+    name house_15;
+    phases AS;
+    nominal_voltage 120;
+    constant_power_12 6623.66668249131+0j;
+}
+object recorder {
+    name house_15_voltage_recorder;
+    parent house_15;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/house_15_voltage.csv";
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+object recorder {
+    name rec;
+    parent mr_meter1;
+    property voltage_1,voltage_2;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/voltage_a.csv";
+}
+object recorder {
+    name service_power_recorder;
+    parent mr_meter1;
+    property measured_real_power,measured_reactive_power;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/service_power.csv";
+}
+object recorder {
+    name node4_voltage_recorder;
+    parent Node4;
+    property voltage_A;
+    interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/node4_voltage.csv";
+}
+
+object triplex_meter { name house5_inv_meter; parent house_5; phases AS; nominal_voltage 120; }
+object inverter {
+    name house5_inverter; parent house5_inv_meter; phases AS;
+    generator_status ONLINE; generator_mode SUPPLY_DRIVEN;
+    inverter_type FOUR_QUADRANT; four_quadrant_control_mode CONSTANT_PQ;
+    rated_power 7600; inverter_efficiency 0.96; P_Out 0; Q_Out 3344;
+}
+object battery {
+    name house5_battery; parent house5_inverter;
+    use_internal_battery_model TRUE; battery_type LI_ION; generator_mode SUPPLY_DRIVEN;
+    nominal_voltage 400; rated_power 7600; battery_capacity 10000; state_of_charge 0.5;
+    round_trip_efficiency 0.90;
+}
+object recorder { parent house5_inverter; property P_Out,Q_Out,VA_Out; interval 60;
+    file "/home/midrar/projects/adaptive_vvo/gld/rq1/results/step10_location/h05_q44/heavy_node4_0.995pu/inverter_house5.csv"; }
