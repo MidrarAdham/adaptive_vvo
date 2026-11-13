@@ -63,7 +63,7 @@ import pandas as pd
 from IPython.display import Markdown
 
 # Load data and convert to markdown format
-filepath = "../../gld/rq1/results/step1_calibration/summary.csv"
+filepath = "../../gld/rq1/00_calibration/results/summary.csv"
 df = pd.read_csv(filepath)
 Markdown(df.to_markdown(index=False))
 ```
@@ -83,7 +83,7 @@ import pandas as pd
 from IPython.display import Markdown
 
 # Load data and convert to markdown format
-filepath = "../../gld/rq1/results/step2_operating_points/house_voltages.csv"
+filepath = "../../gld/rq1/archive/swing_sweep/results/step2_operating_points/house_voltages.csv"
 df = pd.read_csv(filepath)
 df = df.head(10)
 Markdown(df.to_markdown(index=False))

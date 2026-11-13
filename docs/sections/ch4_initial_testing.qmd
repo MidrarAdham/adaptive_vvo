@@ -2,6 +2,23 @@
 The GridLAB-D file is set to 15 houses, with a single substation transformer and distribution transformer. There are two nodes: upstream node and node 4. The upstream node is a swing bus node. Node 4 is the main node wherein all the loads connect to. 
 
 ### Initial Case
+
+---
+
+#### Feeder demand profile
+
+![Top plot shows the demand profile at the feeder head. Lower plot shows the demand voltages at each tap of the feeder](../figures_qmd/base_day.svg)
+
+Note that the voltage drop is at the tap of house 15. The lowest voltage points are always at tap 15.
+
+#### Adding one inverter to house 15
+
+![Top plot shows the demand profile at the feeder head. Middle plot shows the voltages at each tap. The lower plot shows the impact of the inverter at each house tap.](../figures_qmd/day_inverter_h15.svg)
+
+The dotted line in the middle plot shows the voltage of house 15 without the inverter installed in there. However, the house 15 voltage is shown after the inverter was set at house 15. Note that the inverter was pushing $44\%$ of its Q capacity, the whole day, which is intentional. 
+
+---
+
 None of the houses have inverters in them. The voltagge behavior is depicted at each house, as well as the source node.
 
 ![The voltage at each house, with a total of 15 houses. The first figure shows the voltage at Node 4, which is not a Swing node (obviously!)](../figures_qmd/basecase_voltages.svg)
