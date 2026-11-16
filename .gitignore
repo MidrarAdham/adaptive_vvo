@@ -8,3 +8,5 @@ references/
 *.html
 *.css
 *.pyc
+*.js
+*.json

@@ -3,7 +3,7 @@ The GridLAB-D file is set to 15 houses, with a single substation transformer and
 
 ### Initial Case
 
----
+***
 
 #### Feeder demand profile
 
@@ -17,7 +17,70 @@ Note that the voltage drop is at the tap of house 15. The lowest voltage points 
 
 The dotted line in the middle plot shows the voltage of house 15 without the inverter installed in there. However, the house 15 voltage is shown after the inverter was set at house 15. Note that the inverter was pushing $44\%$ of its Q capacity, the whole day, which is intentional. 
 
----
+Sweeping the inverters location at each house produces @fig-inv-sweep-76. Adding an inverter at any house lifts the whole feeder up, showed by the blue dots. The orange dots shows where the location of the inverter is. Finally, the gray dots show the voltage measurements at each house before the inverters. 
+
+![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles.svg){#fig-inv-sweep-334}
+
+@fig-inv-sweep-334 shows the same trend, but with the inverter pushing only $44\%$ of $Q$ of its capacity.
+
+![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles_full_q.svg){#fig-inv-sweep-76}
+
+##### Worked Problem to validate the numbers in @fig-inv-sweep-76
+
+Figure @fig-4node-sld shows the IEEE 4-node feeder single line diagram. The added taps lengths and segments length are example numbers.
+
+![IEEE4-Node Feeder SLD](../figures_qmd/sld_4node.svg){#fig-4node-sld}
+
+**Quantities to Consider:**
+
+| Object | Known | GLM-Derived|
+|:------|:-----|---------:|
+| Swing node (node4) Voltage | $2400~V~=~1~p.u.$| Yes |
+| Xfmr ($kVA$)| $50~kVA$ | Yes |
+| Xfmr Voltages ($V$) | $\frac{V_{p} = 2400}{V_{s}=240}$| Yes |
+| Xfmr Resistance ($p.u.$) | $R=0.01~p.u.$ | Yes |
+| Xfmr Reactance ($p.u.$) | $X=0.06~p.u.$ | Yes |
+| tplx conductor $R$ | $R=0.57\frac{\Omega}{mile}$ | Yes |
+| tplx conductor $GMR$ | $0.0111~ft$ | Yes |
+| tplx conductor $diameter$ | $0.4~in$ | Yes  |
+| tplx conductor $insulation$ | $0.1~in$  | Yes |
+| Segment Length | $40~ft$ | Yes        |
+| Service Conductor Length | $30~ft$       | No |
+| Inverter ($kVA$) | $7.2~kVA$ | No  |
+| Inverter ($P$) | $0~kW$ | No |
+| Inverter ($Q$) | $+3.334~kVAr$ | No |
+| Base Voltage ($V$) | $240~V$ | Yes |
+
+: IEEE-4 Node Feeder {#tbl-4node}
+
+We use @eq-simplified-voltage-equation derived in the previous section.
+
+$$\Delta V = \frac{r_{i}P_{i} + x_{i}Q_{i}}{V}$$
+
+The calcualtions we had to make are as follows:
+
+Base impedance:
+$$Z_{base} = \frac{V^{2}}{S} = \frac{240^{2}~V}{50~kVA} = 1.15\Omega$$
+
+The GridLAB-D configuration objects give the transformer data in per unit. Calcualting the actual values:
+
+$$X_{xfmr,~act} = Z_{base} \times X_{p.u.} = 1.15 \times 0.06 = 0.0691~\Omega$$
+
+And the transformer resistance:
+
+$$R_{xfmr,~act} = Z_{base} \times R_{p.u.} = 1.15 \times 0.01 = 0.0115~\Omega$$$$
+
+GridLAB does not express the reactance of the tplx lines, it only gives the GMR, with the following assumptions:
+
+$$\rho = 100~\Omega\cdot m$$
+$$f = 60~Hz$$
+
+Therefore,
+
+$$D_{12} = \frac{d+2t}{12} = 0.05~ft$$
+$$D_{13} = \frac{d+t}{12} = 0.0417~ft$$
+
+***
 
 None of the houses have inverters in them. The voltagge behavior is depicted at each house, as well as the source node.
 
@@ -134,7 +197,9 @@ $$V_{p.u.} = \frac{V_{act}}{V_{base}} = \frac{1.44~V}{240~V} \approx 0.006 \appr
 Note that the $50~kVA$ is at the transformer, not house 15. 
 
 ##### **Understanding the Jacobian used in this experiment**
----
+
+***
+
 The Jacobian describes how small changes in the assumed bus voltages change the calculated electrical quantities. To interpret the matrix printed by GridLAB-D, we first need to identify those voltage values and the quantities the solver is trying to balance.
 
 ###### Step 1: Describe one voltage using two numbers

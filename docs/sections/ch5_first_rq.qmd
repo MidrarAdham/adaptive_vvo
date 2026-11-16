@@ -14,6 +14,8 @@ Develop a sensitivity-based model that determines the decoupling range as a func
 
 **Baseline: no inverter**
 
+
+
 4. Sweep the swing voltage from about 0.95 to 1.05 pu in small steps (0.005 pu).
 
 5. Record two numbers:
