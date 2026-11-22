@@ -1,33 +1,9 @@
 ## Setup
-The GridLAB-D file is set to 15 houses, with a single substation transformer and distribution transformer. There are two nodes: upstream node and node 4. The upstream node is a swing bus node. Node 4 is the main node wherein all the loads connect to. 
+The GridLAB-D file is set to 8 houses, with a single substation transformer and distribution transformer. There are two nodes: upstream node and node 4. The upstream node is a swing bus node. Node 4 is the main node wherein all the loads connect to. 
 
 ### Initial Case
 
-***
-
-#### Feeder demand profile
-
-![Top plot shows the demand profile at the feeder head. Lower plot shows the demand voltages at each tap of the feeder](../figures_qmd/base_day.svg)
-
-Note that the voltage drop is at the tap of house 15. The lowest voltage points are always at tap 15.
-
-#### Adding one inverter to house 15
-
-![Top plot shows the demand profile at the feeder head. Middle plot shows the voltages at each tap. The lower plot shows the impact of the inverter at each house tap.](../figures_qmd/day_inverter_h15.svg)
-
-The dotted line in the middle plot shows the voltage of house 15 without the inverter installed in there. However, the house 15 voltage is shown after the inverter was set at house 15. Note that the inverter was pushing $44\%$ of its Q capacity, the whole day, which is intentional. 
-
-Sweeping the inverters location at each house produces @fig-inv-sweep-76. Adding an inverter at any house lifts the whole feeder up, showed by the blue dots. The orange dots shows where the location of the inverter is. Finally, the gray dots show the voltage measurements at each house before the inverters. 
-
-![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles.svg){#fig-inv-sweep-334}
-
-@fig-inv-sweep-334 shows the same trend, but with the inverter pushing only $44\%$ of $Q$ of its capacity.
-
-![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles_full_q.svg){#fig-inv-sweep-76}
-
-##### Worked Problem to validate the numbers in @fig-inv-sweep-76
-
-Figure @fig-4node-sld shows the IEEE 4-node feeder single line diagram. The added taps lengths and segments length are example numbers.
+Figure @fig-4node-sld shows the IEEE 4-node feeder single line diagram.
 
 ![IEEE4-Node Feeder SLD](../figures_qmd/sld_4node.svg){#fig-4node-sld}
 
@@ -68,7 +44,7 @@ $$X_{xfmr,~act} = Z_{base} \times X_{p.u.} = 1.15 \times 0.06 = 0.0691~\Omega$$
 
 And the transformer resistance:
 
-$$R_{xfmr,~act} = Z_{base} \times R_{p.u.} = 1.15 \times 0.01 = 0.0115~\Omega$$$$
+$$R_{xfmr,~act} = Z_{base} \times R_{p.u.} = 1.15 \times 0.01 = 0.0115~\Omega$$
 
 GridLAB does not express the reactance of the tplx lines, it only gives the GMR, with the following assumptions:
 
@@ -79,6 +55,247 @@ Therefore,
 
 $$D_{12} = \frac{d+2t}{12} = 0.05~ft$$
 $$D_{13} = \frac{d+t}{12} = 0.0417~ft$$
+
+***
+
+#### Feeder demand profile
+
+![Top plot shows the demand profile at the feeder head. Lower plot shows the demand voltages at each tap of the feeder](../figures_qmd/base_day_8.svg){#fig-basecase-no-invs}
+
+Note that the voltage drop is at the tap of house 8. The lowest voltage points are always at tap 8. I added the swing node voltage as well as the secondary side of the transformer voltage. The $V_{xfmr,sec}$ is lower than the swing node voltage, given that the transformer's impedance is given as $Z = R+jX\rightarrow0.01+j0.06~p.u.$ @eq-simplified-voltage-equation was derived as:
+
+$$
+\Delta V \approx \frac{R \cdot P+X\cdot Q}{V}
+$$
+
+Given that the inverter is set to $P=0$, the equation becomes:
+
+$$
+\Delta V \approx \frac{X\cdot Q}{V}
+$$
+
+Before adding the inverter, we can run our own calculations to see if they match the simulation results.
+
+**Given**
+
+- $length_{tplx~line} = 40 ft~\text{(one mile is 5280 feet)}$
+- $V_{tplx-line} = 240~V$
+- $R_{line} = 1.14~\Omega/mile$
+    - $\frac{40~ft}{5280~mile}\times1.14~\Omega\rightarrow \boxed{R_{line}\approx0.0086~\Omega}$
+- $X_{line} = 0.365~\Omega/mile$
+    - $\frac{40~ft}{5280~mile}\times0.37~\Omega\rightarrow \boxed{X_{line}\approx0.0028~\Omega}$
+- The meter measured the voltage at tap 1 as $\boxed{V_{tap~1}=238.90~V}$
+- The 8 houses draw $\approx 20.43~kW$
+    - The meter records $\approx 20.70~kW$
+
+**Basecase (No inverter case):**
+
+::: {.callout-note appearance="simple"}
+In FBS, currents are calcualted using the backward sweep using flat start voltage values. Voltages, however, are calculated using the forward sweep based on the current vlaues in the backward sweep.
+
+Converting the transformer's impedance values:
+$$R_{xfmr} = 0.01~p.u. \times 1.15~\Omega = 0.012~\Omega$$
+$$X_{xfmr} = 0.06~p.u. \times 1.15~\Omega = 0.069~\Omega$$
+:::
+
+The voltage at each transformer leg is recorded by GridLAB-D at $$\hat{V}_{\phi,~xfmr} = 119.45~V\angle{-1.43^{\circ}}$$
+
+- The current at the main carries:
+    - $I_{main} = \frac{P_{main}}{V_{sec}} = \underbrace{\frac{20.43~kW}{240~V\angle{0^{\circ}}}}_{\text{Backward Sweep \\ so voltages and \\ angles are flat start}} = 85.14~A\angle{0^{\circ}}\approx I_{sec}$
+    - $I_{house1} = \frac{1.39~kW}{240~V\angle{0^{\circ}}} = 5.79~A\angle{0^{\circ}}$
+
+- The voltage at the transformer secondary side - Forward Sweep:
+    - $\hat{V}_{sec} = \hat{V}_{node4} - Z_{xfmr}\hat{I}_{main}$
+        - $\hat{V}_{sec} = 240~V\angle{0^{\circ}} - (0.012+j0.069)(85.14~A) = 239.09~V\angle{-1.410^{\circ}}$
+
+- The voltage at the first tap (tap1):
+
+    - $\hat{V}_{tap1} = 239.09~V\angle{-1.41^{\circ}} - Z_{xfmr \rightarrow tap1}\hat{I}_{main}$
+        - $\hat{V}_{tap1} = 239.09~V\angle{-1.41^{\circ}} - (0.0086+j0.0028)(85.14~A) = 238.36~V\angle{-1.471^{\circ}}$
+
+- The voltage at the first house:
+
+    - $\hat{V}_{house1} =  V_{tap1} - Z_{tap1 \rightarrow house1}\hat{I}_{service}$
+
+        - $\hat{V}_{house1} = 238.36~V\angle{-1.47^{\circ}} - (0.0065+j0.0021)(5.79~A) = 238.33~V\angle{-1.475^{\circ}}$
+
+Repeating the FBS for multiple iterations, we get the following:
+
+| Iteration | $I_{sec}$ (A) | Secondary (V) | Tap 1 (V) | House 1 (V) | Largest Change (V) |
+|:---------:|----------:|:-------------:|:---------:|:-----------:|-------------------:|
+| 1 | 85.142 | 239.092 ∠−1.4104° | 238.362 ∠−1.4714° | 238.325 ∠−1.4745° | 8.8 |
+| 2 | 86.542 | 238.904 ∠−1.4272° | 238.156 ∠−1.4841° | 238.118 ∠−1.4870° | 0.31 |
+| 3 | 86.642 | 238.903 ∠−1.4289° | 238.154 ∠−1.4858° | 238.116 ∠−1.4887° | 0.011 |
+| 4 | 86.644 | 238.903 ∠−1.4289° | 238.154 ∠−1.4858° | 238.116 ∠−1.4887° | 0.00038 |
+| 7 | 86.644 | 238.903 ∠−1.4289° | 238.154 ∠−1.4858° | 238.116 ∠−1.4887° | $2 \times 10^{-8}$ |
+
+: Iterative Convergence Results {#tbl-iteration-convergence}
+
+The results are expected and they match GridLAB-D. Note that the largest change is due to the fact that we used flat start values. Once the voltages are tuned in, then the voltage error is reduced to s amll vcalues!
+
+
+
+The drop in the voltage can be attributed to the transformer's $R$ and $X$, as well as the demand current. The transformer is $50~kVA$, $V_{sec} = 240~V$, with $Z_{base}=\frac{240^{2}}{50~kVA}=1.15~\Omega$. Therefore:
+
+The KVL equation for a transformer equivalent circuit:
+
+$$V_{s} = V_{p} - I_{load}\cdot (R+jX)$${#eq-xfrmr-kvl}
+
+Because the primary is connected directly to the swing node at almost no distance (using parent-child relationship in GLD), its voltage is constant at $\boxed{2.4~kV}$. The current drawn by the loadas connected to the secondary side of the transformer:
+
+$$
+I_{load} = \frac{\bar{V}_{p}-\bar{V}_{s}}{R+jX}
+$$
+
+The current drawn by the loadas connected to the secondary side of the transformer:
+
+$$
+I_{load} = \frac{(1\angle{0})-(0.9954\angle{-1.43^{\circ})}}{0.01+j0.06} \approx \frac{0.0253\angle{78.87^{\circ}}}{0.01+j0.06} \approx 0.416~pu~\angle{-1.67^{\circ}}
+$$
+
+Converting the pu current into $I_{base}:$
+
+- Calculate the base value:
+$$
+I_{base} = \frac{S_{base}}{V_{base}} = \frac{50~kVA}{240~V} = 208.33~A
+$$
+
+- Then the $I_{actual}$ becomes:
+
+$$I_{actual} = I_{pu} \times I_{base}$$
+$$I_{actual} = 0.416~pu \times 208.33~A = \boxed{86.7~A}$$
+
+The calculated current value ($86.7~A$) matches the GridLAB-D measured value ($86.64~A$).
+
+Recall that the meter at the secondary transformer side records:
+
+$$P = 20.70~kW$$
+
+The houses actually draw:
+
+$$P = 20.43~kW$${#eq-impedances}
+
+The losses calculated from these two values are follows.
+
+- The impedance of the main line (Transformer secondary $\rightarrow$ Tap1 $40~ft$)
+    - $R_{tplxLine,~main} = 1.14~pu \times \frac{40~ft}{5280~mile}=0.0086~\Omega$
+    - $X_{tplxLine,~main} = 0.365~pu \times \frac{40~ft}{5280~mile}=0.0028~\Omega$
+
+- The impedance of the main line (Tap1 $\rightarrow$ House 1 $30~ft$)
+    - $R_{tplxLine,~branch} = 1.14~pu \times \frac{30~ft}{5280~mile}=0.0065~\Omega$
+    - $X_{tplxLine,~branch} = 0.37~pu \times \frac{30~ft}{5280~mile}=0.0021~\Omega$
+
+- The voltages along the triplex lines:
+    - $V_{xfrmr,sec} = 119.45\angle{-1.43^{\circ}}$
+    - $V_{tap1} = 119.08\angle{-1.49^{\circ}}$
+    - $V_{house1} = 119.06\angle{-1.49^{\circ}}$
+
+- The currents along the triplex lines (starting with the main line):
+    - $\hat{I}_{main} = \left(\frac{\bar{S}}{\hat{V}_{sec}}\right)^{*}$
+        - $\hat{I}_{main}= \frac{(20.70+j0.085)~kVA}{238.90\angle{-1.43^{\circ}}} = 86.64~A\angle{-1.66^{\circ}}$, which matches the above calculations for main.
+
+- Losses in the main line:
+    - $P_{losses} = I^{2}\cdot R = (7.51~kA)(0.0086~\Omega) = 64.83~W$
+    - $Q_{losses} = I^{2}\cdot X = (7.51~kA)(0.0028~\Omega) = 20.77~VAr$
+
+- Currents in the service line:
+    - $|I_{service}| = \frac{1388.5~W}{238.12~V} = 5.83~A$
+- Losses in the service lines:
+    - $P_{losses} = I^{2}\cdot R = (34.00~A)(0.0065~\Omega) = 0.220~W$
+    - $Q_{losses} = I^{2}\cdot X = (34.00~A)(0.0021~\Omega) = 0.071~VAr$
+***
+
+
+
+#### Adding one inverter to house 8
+
+![Top plot shows the demand profile at the feeder head. Middle plot shows the voltages at each tap. The lower plot shows the impact of the inverter at each house tap.](../figures_qmd/day_inverter_h08.svg){#fig-adding-one-inv}
+
+The dotted line in the middle plot shows the voltage of house 8 without the inverter installed in there. However, the house 8 voltage is shown after the inverter was set at house 8. Note that the inverter was pushing $44\%$ of its Q capacity, the whole day, which is intentional. 
+
+Sweeping the inverters location at each house produces @fig-inv-sweep-76. Adding an inverter at any house lifts the whole feeder up, showed by the blue dots. The orange dots shows where the location of the inverter is. Finally, the gray dots show the voltage measurements at each house before the inverters. 
+
+![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles_8_full_q.svg){#fig-inv-sweep-76}
+
+@fig-inv-sweep-334 shows the same trend, but with the inverter pushing only $44\%$ of $Q$ of its capacity.
+
+![Moving the inverter at each house and monitoring the behavior of the house tap as well as the other taps](../figures_qmd/day_location_profiles_8.svg){#fig-inv-sweep-334}
+
+Considering the inverter is swept through house 1 to house 8, the changed parameter here is the reactive power. The real power remains the same. The impedances remain the same, as shown in @eq-impedances. 
+
+
+
+##### Worked Problem to validate the numbers in @fig-inv-sweep-76
+
+The inverter at house 1 changed the clauclations a bit. The load apparent power is now:
+
+$$\bar{S}_{house 1} = 1.39-j7.60~kVA$$
+
+Working the backward sweep using the flat start values:
+$$\hat{I}_{main} = 90.84~A\angle{20.40^{\circ}}$$
+
+$$\hat{I}_{sec} = \left(\frac{1.39-j7.6~kVA}{240~V\angle{0^{\circ}}}\right)^{*}=32.19~A\angle{79.65^{\circ}}$$
+
+Note that the current now leads the voltage, unlike the basecase, where the current lagged the voltage.
+
+Working the forward sweep:
+
+::: {.callout-note appearance="simple"}
+Before starting, keep in mind that $I_{sec} = I_{main}$. To detail this proccess, the current found above was:
+
+$$\hat{I}_{main} = 90.84~A\angle{20.40^{\circ}}$$
+
+In rectangular form:
+
+$$\hat{I}_{main} = 85.14+j31.67~A$$
+:::
+
+
+
+$$\hat{V}_{sec} = \hat{V}_{node4} - Z_{xfmr}\hat{I}_{main}$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (R_{xfmr}+jX_{xfmr})\hat{I}_{main}$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (R_{xfmr}+jX_{xfmr})\hat{I}_{main}$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (R_{xfmr}+jX_{xfmr})(I_{real}+jI_{imag})$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (R_{xfmr}I_{real}-X_{xfmr}I_{imag})+j(XI_{real}+RI_{imag})$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (0.012+j0.07)(85.14+j31.67)$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (0.012\times 85.14+0.012\times j31.67+j0.07\times85.14-j0.07\times j31.67)$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (1.02+j0.38+j5.96-2.22)$$
+
+$$\hat{V}_{sec} = 240\angle{0^{\circ}} - (1.02-2.22)+j(0.38+5.96)$$
+
+$$\hat{V}_{sec} = 241.29~V\angle{-1.48^{\circ}}$$
+
+If we iterate over the FBS, we end up with:
+
+| Iteration | $I_T$ (A) | $I_{\mathrm{svc1}}$ (A) | Secondary (V) | Tap 1 (V) | House 1 (V) |
+|:---------:|----------:|-----------------------:|:-------------:|:---------:|:-----------:|
+| 1 | 90.840 | 32.191 | 241.289 ∠−1.4842° | 240.655 ∠−1.6094° | 240.690 ∠−1.6609° |
+| 2 | 91.266 | 32.099 | 241.081 ∠−1.5015° | 240.426 ∠−1.6221° | 240.454 ∠−1.6737° |
+| 3 | 91.377 | 32.130 | 241.082 ∠−1.5033° | 240.427 ∠−1.6241° | 240.455 ∠−1.6757° |
+| 7 | 91.378 | 32.130 | 241.082 ∠−1.5033° | 240.426 ∠−1.6241° | 240.455 ∠−1.6758° |
+
+: Iterative Convergence Results {#tbl-iteration-convergence-inv}
+
+The hand calculations and the gridlabd are closely related:
+
+| Point | No Inv: Hand-calc | No Inv: GridLAB-D | W Inv: Hand-calc | W Inv: GridLAB-D |
+|:------|:------------:|:-----------------:|:------------:|:-----------------:|
+| Secondary | 0.99543 ∠−1.4289° | 0.99542 ∠−1.4289° | 1.00451 ∠−1.5033° | 1.00451 ∠−1.5033° |
+| Tap 1 | 0.99231 ∠−1.4858° | 0.99231 ∠−1.4858° | 1.00178 ∠−1.6241° | 1.00177 ∠−1.6241° |
+| House 1 | 0.99215 ∠−1.4887° | 0.99215 ∠−1.4887° | 1.00189 ∠−1.6758° | 1.00189 ∠−1.6758° |
+
+: Comparison of Hand Calculations and GridLAB-D Results (pu) {#tbl-hand-gridlabd-comparison}
+
+::: {.callout-note appearance="simple"}
+The main takeaway here is that the inverter makes the current lead, and that leading current through the transformer's X pushes the voltage magnitude up. Real power still flows forward, which is why the voltage angle keeps dropping along the feeder.
+:::
 
 ***
 

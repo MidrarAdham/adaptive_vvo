@@ -1,0 +1,58 @@
+---
+title: "Residential Secondary Topology in Portland General Electric Territory"
+---
+
+## Proposed GridLAB-D case
+
+The proposed case uses a 50 kVA pole-mounted transformer, a 7.2 kV phase-to-neutral primary, and a 120/240 V split-phase secondary serving eight houses. Two shared secondary mains extend 150 ft and 110 ft from the transformer pole. The pole spacing comes from Portland General Electric (PGE) mapping in Portland's Sellwood neighborhood. The transformer impedance comes from a manufacturer specification. The case assumes the secondary routes and house assignments.
+
+| Parameter | Current location-sweep in h01.glm | Proposed case |
+|---|---:|---:|
+| Primary voltage, phase to neutral | 2,400 V | 7,200 V |
+| Transformer rating | 50 kVA | 50 kVA |
+| Transformer resistance | 0.0100 pu | 0.00984 pu |
+| Transformer reactance | 0.0600 pu | 0.01912 pu |
+| Shared secondary main | One 600 ft run | Two runs of 150 ft and 110 ft |
+| Tap spacing | One tap every 40 ft | One shared tap at each neighboring pole |
+| Houses per transformer | 15 | 8 |
+| Individual service drops | 30 ft each | 40–80 ft each |
+
+The current case is `gld/rq1/03_location_sweep/cases/h01/h01.glm`. Its 600 ft main consists of fifteen 40 ft sections.
+
+## Pole spacing and secondary layout
+
+I used the PGE public GIS distribution pole layer (layer 13) and overhead primary layer (layer 17) to identify a row of poles along the SE 19th Avenue corridor in Sellwood. I calculated straight-line distances between successive pole points in Oregon State Plane North coordinates (EPSG:2913, feet). These are horizontal distances between poles. [PGE Distribution Pole layer](https://services6.arcgis.com/eqsXlDArbs19VWhn/arcgis/rest/services/Public_Data/FeatureServer/13) · [PGE Overhead Primary Distribution layer](https://services6.arcgis.com/eqsXlDArbs19VWhn/arcgis/rest/services/Public_Data/FeatureServer/17)
+
+| Pole pair from south to north (GIS object IDs) | Distance (ft) |
+|---|---:|
+| 124947 to 124948 | 96.2 |
+| 124948 to 234395 | 101.4 |
+| 234395 to 121673 | 159.3 |
+| 121673 to 234477 | 149.5 |
+| 234477 to 275902 | 109.6 |
+
+The modeled transformer sits at the middle of the final three positions. Rounding the two adjacent spans to 150 ft and 110 ft gives 260 ft of installed shared main. Three houses connect to each neighboring pole and two connect directly to the transformer pole. Multiple houses served from the same pole share one GridLAB-D tap node and have individual service lines. With an 80 ft drop at the end of the longer main, the longest modeled transformer-to-house path is 230 ft.
+
+PGE's *Electric Service Requirements*, Table 3 and §7.3, specify grounded three-wire 120/240 V overhead service and a single-span connection to the residence. Table 25 lists a less-than-100-ft service length for the specified unsupported 2-inch mast and a service of 200 A or less. The 40–80 ft drops are assumed values for this layout. The public GIS establishes pole geometry. The proposed secondary conductor routes and sizes, the transformer location, and the house assignments would need confirmation from a utility job sketch. [PGE Electric Service Requirements, January 2026](https://downloads.ctfassets.net/416ywc1laqmd/2PmrU1CptipEQUJAD1Ooyb/28ecb369c6b9fad5a6c38cefb52e3c46/ESR_January_2026_Book.pdf) · [PGE Subdivision Construction Guide, §2.2](https://assets.ctfassets.net/416ywc1laqmd/1ClvdWmRl42RZN6seiNOjc/6d0065a242a9d4a0d1c1f59c1282858c/Subdivision_Construction_Guide_-_2025.pdf)
+
+## Transformer voltage and impedance
+
+PGE Rule C lists 12,470/7,200 V grounded wye as its general primary service and reserves 2,400 V service for legacy installations. The proposed single-phase primary uses the 7,200 V phase-to-neutral voltage. In GridLAB-D, that means setting `Node4`'s nominal voltage and swing voltage magnitude and `PoleTop.primary_voltage` to 7,200 V. With `SINGLE_PHASE_CENTER_TAPPED`, `secondary_voltage 120` represents 120 V on each leg and 240 V between legs. The GIS layers used for the span measurements establish the route, while Rule C supplies the primary voltage assumption. [PGE Rule C, §3](https://assets.ctfassets.net/416ywc1laqmd/5SfZZl4LC1xf9xctCK3Aqr/887488a2c2a3e477b7e91d1b6612b50c/Rule_C.pdf) · [GridLAB-D transformer implementation](https://github.com/gridlab-d/gridlab-d/blob/master/powerflow/transformer.cpp#L798-L858)
+
+SCOTECH publishes a 50 kVA single-phase pole-mounted unit with a 7,200 V primary, a 120/240 V secondary, 492 W of rated load loss, and 2.15% impedance. The rated load loss gives the equivalent series resistance on the 50 kVA base. The impedance magnitude and resistance then give the reactance. [SCOTECH transformer specification](https://www.scotech.com/pole-mounted-transformer/single-phase-pole-mounted-transformer/case250940607-50kva-7200v-canada-2025.html)
+
+$$
+R_{\mathrm{pu}} = \frac{492\,\mathrm{W}}{50{,}000\,\mathrm{VA}} = 0.00984
+$$
+
+$$
+X_{\mathrm{pu}} = \sqrt{0.0215^2 - 0.00984^2} \approx 0.01912
+$$
+
+Use these values for `PoleTop.resistance` and `PoleTop.reactance`. The manufacturer unit is a proxy for a transformer with the same voltage ratio and rating. A factory test sheet would establish the impedance of the installed PGE unit.
+
+## Houses per transformer
+
+Eight houses is a study assumption. Palo Alto Utilities' overhead modernization design specifies up to eight customers per 50 kVA transformer, and an Ontario utility dataset includes a 50 kVA unit serving nine homes. These examples provide a benchmark for choosing a house count. PGE Rule C states that the company sizes transformers to the kVA requirement it determines for the customer. The PGE sources reviewed here leave the house count for a particular 50 kVA unit unverified. [Palo Alto Utilities, packet p. 65](https://www.cityofpaloalto.org/files/assets/public/v/2/agendas-minutes-reports/agendas-minutes/utilities-advisory-commission/archived-agenda-and-minutes/agendas-and-minutes-2024/02-feb-2024/02-07-2024-packet.pdf#page=65) · [Ontario utility study, Table 3](https://www.nbseh.org/index.php/journals/article/download/83/10.63095.NBSEH.25.546902/576) · [PGE Rule C](https://assets.ctfassets.net/416ywc1laqmd/5SfZZl4LC1xf9xctCK3Aqr/887488a2c2a3e477b7e91d1b6612b50c/Rule_C.pdf)
+
+Summing the 15 scaled load profiles used by `h01.glm` at each one-minute timestamp gives a coincident peak of **25.7 kVA at 17:30 on September 1, 2025**. That is about 51% of the transformer rating before line losses and inverter operation. These profiles cover one day and have zero reactive demand. If the location sweep needs all 15 houses, the same study can use groups of eight and seven on two 50 kVA transformers with separate secondaries.
