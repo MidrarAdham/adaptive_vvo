@@ -1,116 +1,66 @@
-# Residential secondary feeder
+# GridLAB-D models and studies
 
-Run from this directory:
+All commands run from the repository root with `poetry run python ...`.
 
-```bash
-gridlabd 4_node.glm
-poetry run python plot_voltages.py
-```
+## Baseline model: `basecase/residential_8house.glm`
 
-The filename is retained for compatibility; this is no longer the IEEE four-node
-feeder. It is a simplified North American-style residential secondary circuit:
+A simplified North American residential secondary: one 50 kVA pole-top transformer feeding eight houses along a
+shared 120/240 V triplex main.
 
 ```text
-Fixed 2.4 kV source (Node4)
+Node4 (2.4 kV, transformer primary; swing at 1.00 pu in the RQ1 studies)
   |
-50 kVA, 120/240 V service transformer
+50 kVA, 2400 / 120-240 V center-tapped transformer   (r = 0.01 pu, x = 0.06 pu)
   |
-mr_meter1 (residential feeder head)
-  | 100 ft
+mr_meter1 (transformer secondary)
+  | 40 ft main
  tap_1 ---- 30 ft service ---- house_1
-  | 100 ft
+  | 40 ft
  tap_2 ---- 30 ft service ---- house_2
   |
- ... successive 100 ft main segments ...
-  |
- tap_30 --- 30 ft service ---- house_30
+ ...
+  | 40 ft
+ tap_8 ---- 30 ft service ---- house_8      (main = 320 ft)
 ```
 
-The main extends 3,000 ft from the transformer to the last tap. Each main segment
-carries the combined current of all houses downstream. House profiles 1 through
-30 are assigned individually. The active scenario uses 1.5x full-day demand
-from `datasets/scaled_1p5/`; the original files in `datasets/` are unchanged.
-To restore baseline demand, remove `scaled_1p5/` from the 30 player file paths. Profile values are VA; `test.py` converts original
-kW values to W at unity power factor. Do not rescale the existing files again.
+| Item | Value |
+|---|---|
+| Conductor (main and services) | 1/0 AA triplex: 0.57 ohm/mile, GMR 0.0111 ft, 0.4 in diameter, 0.1 in insulation. 240 V loop impedance 1.140 + j0.365 ohm/mile |
+| Loads | `constant_power_12` (balanced 240 V), unity power factor, one-minute player profiles from `datasets/scaled_1p5/` (1.5x the originals in `datasets/`) |
+| Houses | The 8 profiles with the highest daily peak, lightest to heaviest along the main: tap 1-8 = profiles 6, 8, 10, 12, 14, 15, 5, 2 |
+| Day | 2025-09-01, 00:00-23:59, recorders every 60 s |
+| Base case at Node4 = 1.00 pu | Peak 20.4 kW at 17:29 (41% of 50 kVA); lowest voltage tap 8 = 0.979 pu at 17:28 |
 
-## Study assumptions
+The glm keeps an upstream 2.4 kV source and a 1,000 ft primary line feeding Node4. The RQ1 studies remove them
+and make Node4 the swing node (`sweep_node4.make_case`), so the primary voltage is fixed exactly.
 
-- The upstream network is replaced by an ideal 2.4 kV single-phase source.
-  Its recorded voltage is fixed; use mr_meter1 to study the residential head.
-- Transformer rating is an assumed 50 kVA, with the existing 0.01 pu resistance
-  and 0.06 pu reactance retained. These are study inputs, not measured equipment data.
-- Main and services retain the existing triplex conductor configuration:
-  0.57 ohm/mile resistance and 0.0111 ft geometric mean radius.
-  No thermal rating or utility construction standard has been validated.
-- Each house is a constant-power 240 V equivalent (`constant_power_12`).
-  This balances the two 120 V legs and preserves total measured demand. It does
-  not model individual appliances, 120 V leg imbalance, or voltage-dependent loads.
-  Both recorded legs will therefore have nearly equal magnitudes by design.
-- Reactive demand is zero in the input profiles. Add measured reactive demand
-  before using the model for power-factor-sensitive studies.
+These are study assumptions, not a calibrated utility circuit. A PGE-based alternative (7.2 kV primary,
+2.15% impedance transformer, 150/110 ft mains) is described in
+`docs/sections/pge_residential_secondary_topology.qmd` but not built.
 
-This is a plausible study topology, not a calibrated utility feeder. Match
-conductor data, transformer impedance, service lengths and loading to a real
-circuit before treating it as representative of a particular neighborhood.
+### Previous model: `basecase/4_node.glm`
 
-## Outputs
+The same feeder with 15 houses (600 ft main; profiles 1-15; lowest voltage tap 15 = 0.961 pu at 20:46). The
+40 ft spacing was calibrated on it. Houses 16-30 are present but commented out. RQ1 studies 00-03 and the
+older ch4 sections use it. The file name is historical; it is not the IEEE 4-node feeder.
 
-- `results/voltage_a.csv`: residential feeder-head leg voltages.
-- `results/house_N_voltage.csv`: each house's leg voltages after its service.
-- `results/node4_voltage.csv`: fixed upstream source voltage.
-- `results/service_power.csv`: feeder-head W and var.
-- `results/voltages.png`: per-unit voltage plots (120 V house/head base,
-  2,400 V upstream base). Edit settings at the top of `plot_voltages.py`.
+## Folder layout
 
-The active model now contains 30 houses. Profiles 11–30 were imported from
-`/home/midrar/Desktop/IEEE_4_Node_Feeder_Exercise/gld_project_datasets/`:
-source `house power (kW)` values were multiplied by 1,000 for baseline VA files
-(unity PF), and by another 1.5 for the active scaled copies. Original source
-files were left unchanged.
+| Path | Contents |
+|---|---|
+| `basecase/` | The two models above |
+| `datasets/` | House demand profiles (VA, unity PF): originals and `scaled_1p5/` (used) |
+| `sweep_node4.py` | Node4 voltage sweep on the 15-house model, and shared helpers (`make_case`, `recorder_rows`, `magnitude`) imported by every RQ1 study. Keep it |
+| `rq1/` | RQ1 studies. See [rq1/README.md](rq1/README.md) |
+| `rq2/`, `rq3/`, `rq4/` | Placeholders for later research questions |
+| `bess/`, `run_house15_bess.py`, `sweep_house15_q.py` | Early 15-house experiments: a 5 kVA inverter at house 15 tracking 1.00 pu, and a Q sweep at 20:46 (ch4, "Thinking out loud"). See `bess/README.md` |
+| `verify_ch2/` | Scripts that check the ch2 equations and the GridLAB-D Jacobian against simulation (ch4, Jacobian section) |
+| `figures/` | Figures for the older ch4 sections and `plot_voltages.py` |
+| `results/` | Outputs of the early experiments (not tracked in git) |
 
-**The 30-house simulation does not complete.** With the retained 50 kVA
-transformer, existing conductors, 100 ft tap spacing, and 1.5x demand, GridLAB-D
-reports line continuous/emergency rating violations and stops with a convergence
-failure near 04:45 local time. Current result CSVs and the regenerated plot cover
-only the partial run, not a full day. These results must not be treated as a
-validated operating case. A realistic expansion needs a redesigned main or
-multiple transformer-fed secondary circuits; transformer enlargement alone
-does not address the long shared secondary main.
+## Conventions
 
-GridLAB-D property reference:
-https://gridlab-d.readthedocs.io/en/docs/docs/3.0%20-%20Modeling%20Reference/Modules/Powerflow/Classes/21-triplex_load/
-
-## Upstream line addition
-
-`upstream_source` is now the fixed 2,400 V swing reference. It feeds the
-variable-voltage transformer primary `Node4` through `upstream_line`.
-The upstream line is 1,000 ft and uses the original `LC300` configuration,
-`LS200` spacing, phase conductor `OH100` (0.306 ohm/mile, 0.0244 ft GMR),
-and neutral `OH101` (0.592 ohm/mile, 0.00814 ft GMR). For this AN line,
-the A-to-neutral spacing is 5.656854 ft; B/C geometry is retained for reference.
-GridLAB-D computes impedance from these conductor and geometry inputs.
-The line length remains a study assumption.
-`results/node4_voltage.csv` now records a variable primary voltage.
-No inverter or reactive-power controller has been added in this step.
-The current enabled-house configuration completed a full-day test after this
-addition; earlier 30-house failure notes describe the previous configuration.
-
-## Node4 voltage sweep
-
-Run `poetry run python gld/sweep_node4.py` from the project root. Edit the
-settings at the top of the script; no command-line arguments are required.
-The sweep runs the currently enabled houses for the base-case clock window
-at 0.95 through 1.05 pu in 0.01 pu steps (2,400 V primary base).
-
-Each generated case removes upstream_source and upstream_line and makes Node4
-the swing reference. This imposes the exact Node4 boundary voltage rather than
-merely changing its initial guess. The base-case GLM is never modified; this
-experiment does not represent inverter control or retain upstream-line losses.
-Loads, transformer, service lines, and enabled-house selection are preserved.
-
-Each scenario's GLM, run.log, and time-series CSVs are in
-`gld/results/node4_sweep/node4_X.XXpu/`. The combined `summary.csv` reports
-per-house minima/maxima across both legs, minimum timestamps, and sample counts.
-The figure is `gld/figures/node4_sweep.png`. Daily minima at different houses
-may occur at different timestamps; they are not necessarily a simultaneous
-voltage profile. The current 15-house run completed all 11 cases.
+- Per unit: 2,400 V base on the primary, 120 V base for each secondary leg (240 V for the loop).
+- Positive inverter Q injects reactive power (raises voltage).
+- Each RQ1 study writes its generated glm files to `cases/` and its outputs to `results/`; both are
+  regenerated by the scripts and are not tracked in git.

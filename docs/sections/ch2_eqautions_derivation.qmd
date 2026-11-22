@@ -281,7 +281,7 @@ $$
 \end{bmatrix}
 $$ {#eq-KVL3}
 
-@eq-KVL3 expresses the receiving-end voltage phasors as a function of the sending-end voltage phasors, branch impedance, and phase real and reactive power flows [@gan2014convex]:
+@eq-KVL3 expresses the receiving-end voltage phasors as a function of the sending-end voltage phasors, branch impedance, and phase real and reactive power flows [@gan_convex_2014]:
 
 $$\boxed{\mathbf{\bar V}_{j}=\mathbf f(\mathbf{\bar V}_{i},\mathbf{\bar Z}_{ij},\mathbf P_{ij},\mathbf Q_{ij})}$$
 

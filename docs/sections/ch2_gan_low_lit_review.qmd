@@ -1,6 +1,6 @@
 ## Background Information
 
-**NOTE: This file contains supporting matrix algebra and the fuller multiphase branch-flow formulation of Gan and Low [@gan2014convex]. The working equations are in `ch2_voltage_reactive_equations.qmd`.**
+**NOTE: This file contains supporting matrix algebra and the fuller multiphase branch-flow formulation of Gan and Low [@gan_convex_2014]. The working equations are in `ch2_voltage_reactive_equations.qmd`.**
 
 ## Three-phase Branch Power Matrix
 

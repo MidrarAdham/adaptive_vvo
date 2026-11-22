@@ -312,22 +312,22 @@ When the voltage is swept at Node 4, the same voltage drop is depicted at differ
 ![Voltage Sweeping Across Node4](../figures_qmd/node4_sweep.svg){#fig-sweeping-voltage}
 
 
-```{python}
-#| echo: false
-#| label: tbl-csv-data
-#| tbl-cap: "Simulation Results Data"
+<!-- Static table (first 10 rows) from gld/results/node4_sweep/summary.csv -->
+|   node4_pu |   house |   min_pu |   max_pu | min_timestamp           |   samples |
+|-----------:|--------:|---------:|---------:|:------------------------|----------:|
+|       0.95 |      10 | 0.868333 | 0.927508 | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |      11 | 0.863792 | 0.926525 | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |      12 | 0.859475 | 0.92555  | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |      13 | 0.85565  | 0.925008 | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |      14 | 0.852392 | 0.924492 | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |      15 | 0.8487   | 0.924225 | 2025-09-01 20:46:00 PDT |      1439 |
+|       0.95 |       1 | 0.932058 | 0.94515  | 2025-09-01 17:30:00 PDT |      1439 |
+|       0.95 |       2 | 0.921233 | 0.942225 | 2025-09-01 17:28:00 PDT |      1439 |
+|       0.95 |       3 | 0.914917 | 0.939467 | 2025-09-01 17:28:00 PDT |      1439 |
+|       0.95 |       4 | 0.906658 | 0.936867 | 2025-09-01 06:29:00 PDT |      1439 |
 
-import pandas as pd
-from IPython.display import Markdown
+: Simulation Results Data {#tbl-csv-data}
 
-# Load the CSV file
-df = pd.read_csv("/home/midrar/projects/adaptive_vvo/gld/results/node4_sweep/summary.csv")
-
-df = df.head (10)
-
-# Convert the dataframe directly into a clean markdown table
-Markdown(df.to_markdown(index=False))
-```
 @fig-sweeping-voltage demonstrates that the household voltage response depends on both the upstream voltage and the household's location along the feeder. Note that the distance of voltage lines in @fig-sweeping-voltage decreases consecutively. The current flow in the line supplying house 1 carries the combined current of many downstream loads. The line between house 1 and house 2 carries slightly less current, and so forth. From ohm's law:
 
 $$\Delta \bar{\mathbf{V}} = \bar{\mathbf{Z}}\bar{\mathbf{I}}$$

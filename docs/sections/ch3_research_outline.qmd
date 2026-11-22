@@ -4,11 +4,11 @@ Distribution voltage is conventionally held near nominal along the primary feede
 
 ## State of the Art
 
-- **CVR with smart inverters.** Smart inverters have been coordinated with tap changers, regulators and capacitors to achieve CVR on three-phase unbalanced feeders [@jha2019bilevel; @zhang2019distributed], including integrated primary-secondary networks with voltage-dependent loads [@zhang2021primarysecondary]. In these studies inverters *support* CVR, while the primary voltage stays within its conventional band.
-- **Grid-edge voltage control.** Dedicated utility-owned devices on the secondary side of service transformers regulate customer voltage so that the primary can be lowered further. Field deployments report up to 5% CVR [@moghe2016gridedge], limiting-node voltage increases of 0.88–2.04% [@jha2023gridedge], and energy savings up to 4.7% when combined with smart inverters [@padullaparti2023cvr].
-- **Volt-VAR curve design.** Per-inverter Volt-VAR rules have been optimized for single-phase feeders [@murzakhanov2024optimal], unbalanced multiphase feeders [@gupta2025regulating], and a single utility-scale battery [@ingebrigtsen2026optimizing]. All aim to keep voltages near nominal rather than to compensate a deliberately shifted primary.
-- **Cross-phase coupling.** On unbalanced four-wire networks, reactive power injected on one phase changes the voltages on the other phases [@wang2020interphase; @dalal2024crossphase].
-- **Siting and sizing.** Methods exist to choose how many voltage-support units are needed and where, but for balanced networks [@giannitrapani2017optimal] or PV at medium voltage [@chen2022optimal].
+- **CVR with smart inverters.** Smart inverters have been coordinated with tap changers, regulators and capacitors to achieve CVR on three-phase unbalanced feeders [@jha_bi-level_2019; @zhang_distributed_2019], including integrated primary-secondary networks with voltage-dependent loads [@zhang_distributed_2021]. In these studies inverters *support* CVR, while the primary voltage stays within its conventional band.
+- **Grid-edge voltage control.** Dedicated utility-owned devices on the secondary side of service transformers regulate customer voltage so that the primary can be lowered further. Field deployments report up to 5% CVR [@moghe_grid_2016], limiting-node voltage increases of 0.88–2.04% [@jha_enhancing_2023], and energy savings up to 4.7% when combined with smart inverters [@padullaparti_conservation_2023].
+- **Volt-VAR curve design.** Per-inverter Volt-VAR rules have been optimized for single-phase feeders [@murzakhanov_optimal_2024], unbalanced multiphase feeders [@gupta_regulating_2025], and a single utility-scale battery [@ingebrigtsen_optimizing_2026]. All aim to keep voltages near nominal rather than to compensate a deliberately shifted primary.
+- **Cross-phase coupling.** On unbalanced four-wire networks, reactive power injected on one phase changes the voltages on the other phases [@wang_distributed_2020; @dalal_analyzing_2024].
+- **Siting and sizing.** Methods exist to choose how many voltage-support units are needed and where, but for balanced networks [@giannitrapani_optimal_2017] or PV at medium voltage [@chen_optimal_2023].
 
 ## Research Gap
 
@@ -60,16 +60,16 @@ To develop and evaluate a methodology for inverter-enabled grid-edge voltage reg
 
 ## References
 
-- jha2019bilevel — Jha, Dubey et al., "Bi-Level Volt-VAR Optimization to Coordinate Smart Inverters With Voltage Control Devices," IEEE Trans. Power Syst., 2019. doi:10.1109/tpwrs.2018.2890613
-- zhang2019distributed — Zhang, Dehghanpour and Wang, "Distributed CVR in Unbalanced Distribution Systems With PV Penetration," IEEE Trans. Smart Grid, 2019. doi:10.1109/tsg.2018.2880419
-- zhang2021primarysecondary — Zhang, Guo et al., "Distributed Optimal Conservation Voltage Reduction in Integrated Primary-Secondary Distribution Systems," IEEE Trans. Smart Grid, 2021. doi:10.1109/tsg.2021.3088010
-- moghe2016gridedge — Moghe, Tholomier et al., "Grid Edge Control: A new approach for volt-var optimization," IEEE PES T&D, 2016. doi:10.1109/tdc.2016.7519895
-- jha2023gridedge — Jha, Fan et al., "Enhancing Conservation Voltage Reduction with Grid Edge Volt-VAr Control," IEEE Grid Edge, 2023. doi:10.1109/gridedge54130.2023.10102726
-- padullaparti2023cvr — Padullaparti, Baggu et al., "Conservation Voltage Reduction with Distributed Energy Resource Management System, Grid-Edge, and Legacy Devices," IEEE PESGM, 2023. doi:10.1109/pesgm52003.2023.10252669
-- murzakhanov2024optimal — Murzakhanov, Gupta, Chatzivasileiadis and Kekatos, "Optimal Design of Volt/VAR Control Rules for Inverter-Interfaced Distributed Energy Resources," IEEE Trans. Smart Grid, 2024. doi:10.1109/TSG.2023.3279982
-- gupta2025regulating — Gupta et al., "Regulating Voltage Magnitude and Phase Imbalance using DERs via Volt/VAR Control Rules," IEEE PowerTech, 2025. *(DOI to confirm)*
-- ingebrigtsen2026optimizing — Ingebrigtsen, Bordin, Chiesa and Bakkejord, "Optimizing and implementing Volt-Var control in battery storage systems for voltage regulation in remote distribution networks," Discover Applied Sciences, 2026. doi:10.1007/s42452-025-08069-9
-- wang2020interphase — Wang et al., "A Distributed Inter-Phase Coordination Algorithm for Voltage Control With Unbalanced PV Integration in LV Systems," IEEE Trans. Sustain. Energy, 2020. doi:10.1109/tste.2020.2970214
-- dalal2024crossphase — Dalal et al., "Analyzing Cross-Phase Effects of Reactive Power Intervention on Distribution Voltage Control," IEEE PESGM, 2024. *(DOI to confirm)*
-- giannitrapani2017optimal — Giannitrapani, Paoletti, Vicino and Zarrilli, "Optimal Allocation of Energy Storage Systems for Voltage Control in LV Distribution Networks," IEEE Trans. Smart Grid, 2017. doi:10.1109/TSG.2016.2602480
-- chen2022optimal — Chen et al., "Optimal Placement of PV Smart Inverters With Volt-VAr Control," IEEE Systems Journal, 2022. *(DOI to confirm)*
+- jha_bi-level_2019 — Jha, Dubey et al., "Bi-Level Volt-VAR Optimization to Coordinate Smart Inverters With Voltage Control Devices," IEEE Trans. Power Syst., 2019. doi:10.1109/tpwrs.2018.2890613
+- zhang_distributed_2019 — Zhang, Dehghanpour and Wang, "Distributed CVR in Unbalanced Distribution Systems With PV Penetration," IEEE Trans. Smart Grid, 2019. doi:10.1109/tsg.2018.2880419
+- zhang_distributed_2021 — Zhang, Guo et al., "Distributed Optimal Conservation Voltage Reduction in Integrated Primary-Secondary Distribution Systems," IEEE Trans. Smart Grid, 2021. doi:10.1109/tsg.2021.3088010
+- moghe_grid_2016 — Moghe, Tholomier et al., "Grid Edge Control: A new approach for volt-var optimization," IEEE PES T&D, 2016. doi:10.1109/tdc.2016.7519895
+- jha_enhancing_2023 — Jha, Fan et al., "Enhancing Conservation Voltage Reduction with Grid Edge Volt-VAr Control," IEEE Grid Edge, 2023. doi:10.1109/gridedge54130.2023.10102726
+- padullaparti_conservation_2023 — Padullaparti, Baggu et al., "Conservation Voltage Reduction with Distributed Energy Resource Management System, Grid-Edge, and Legacy Devices," IEEE PESGM, 2023. doi:10.1109/pesgm52003.2023.10252669
+- murzakhanov_optimal_2024 — Murzakhanov, Gupta, Chatzivasileiadis and Kekatos, "Optimal Design of Volt/VAR Control Rules for Inverter-Interfaced Distributed Energy Resources," IEEE Trans. Smart Grid, 2024. doi:10.1109/TSG.2023.3279982
+- gupta_regulating_2025 — Gupta et al., "Regulating Voltage Magnitude and Phase Imbalance using DERs via Volt/VAR Control Rules," IEEE PowerTech, 2025. *(DOI to confirm)*
+- ingebrigtsen_optimizing_2026 — Ingebrigtsen, Bordin, Chiesa and Bakkejord, "Optimizing and implementing Volt-Var control in battery storage systems for voltage regulation in remote distribution networks," Discover Applied Sciences, 2026. doi:10.1007/s42452-025-08069-9
+- wang_distributed_2020 — Wang et al., "A Distributed Inter-Phase Coordination Algorithm for Voltage Control With Unbalanced PV Integration in LV Systems," IEEE Trans. Sustain. Energy, 2020. doi:10.1109/tste.2020.2970214
+- dalal_analyzing_2024 — Dalal et al., "Analyzing Cross-Phase Effects of Reactive Power Intervention on Distribution Voltage Control," IEEE PESGM, 2024. *(DOI to confirm)*
+- giannitrapani_optimal_2017 — Giannitrapani, Paoletti, Vicino and Zarrilli, "Optimal Allocation of Energy Storage Systems for Voltage Control in LV Distribution Networks," IEEE Trans. Smart Grid, 2017. doi:10.1109/TSG.2016.2602480
+- chen_optimal_2023 — Chen et al., "Optimal Placement of PV Smart Inverters With Volt-VAr Control," IEEE Systems Journal, 2022. *(DOI to confirm)*
