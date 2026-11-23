@@ -305,7 +305,7 @@ None of the houses have inverters in them. The voltagge behavior is depicted at 
 
 Note that the voltage drops as the house is at a further distance from node 4. 
 
-### Sweep the voltage at Node 4
+### Sweep the voltage at Node 4 - Dr. Bass said ignore this for now. We'll keep $\hat{V}_{swing} = 1~pu\angle{0}^{\circ}$. Ignore the rest of this section
 
 When the voltage is swept at Node 4, the same voltage drop is depicted at different houses location.
 

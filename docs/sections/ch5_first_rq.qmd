@@ -1,6 +1,117 @@
 ## Quantify the decoupling range.
 Develop a sensitivity-based model that determines the decoupling range as a function of inverter count, location, phase assignment and rating.
 
+## Next steps
+
+I'd base the next steps on the voltage sensitivity we've already measured: how much a tap's voltage rises per $kVAr$ from an inverter at house $k$. Then work backwards from a target voltage to the $Q$ needed. Everything so far shows the rise is close to linear in $Q$:
+
+**Proportional to Q:** going from $3.344~kvar$ to $7.6~kVAr$ multiplied every rise by about $\frac{7.6~kVAr}{3.344~kVAr}=2.27$. The increase of voltage, $\Delta V$ due to reactive power injection, $Q$ can be derived as follows:
+
+- We previously derived the following:
+
+$$
+\Delta V \approx \frac{RP + XQ}{V}
+$${#eq-voltage-change}
+
+Since we are referencing the $Jacobian$, the submatrix $J_{4}$, states the relationship between $Q$ and the voltage magnitude $|V|$:
+
+$$
+J_{4} = \frac{\partial Q}{\partial |V|}
+$$
+
+and since we are only interested in the effect of $Q$, and not changing $P$, then:
+
+$$
+|\Delta V| \approx \frac{X\Delta Q}{V}
+$${#eq-voltage-change-Q-only}
+
+Where:
+
+- $|\Delta V|:$ is the voltage change
+- $X:$ The reactance of that specific segment where $Q$ is changing
+- $\Delta Q:$ The change in $Q$; for instance: $\Delta Q = Q_{inj}=Q_{new}-Q_{ini}$
+
+**NOTE:** The units of the above parameters depend on the units of the parameters we are using.
+
+Measuring the voltage change, $\Delta V$ along the line, all the way up to the swing node, we need to consider the reactance of each segment, such that:
+
+$$
+X = X_{xfrmr}+\sum_{j=1}^{n} X_{ij}
+$$
+
+Substituting the reactance in @eq-voltage-change-Q-only, we get:
+
+$$
+|\Delta V| \approx \left(X_{xfrmr}+\sum_{j=1}^{n} X_{ij}\right) \frac{\Delta Q_{inj}}{V}
+$$
+
+In per unit voltage increase, we can divide both sides by $V_{base}$
+
+$$
+\Delta V_{k, p.u.} \approx \left(X_{xfrmr}+\sum_{j=1}^{n} X_{ij}\right) \frac{\Delta Q_{k,inj}}{V^{2}_{base}}
+$${#eq-voltage-change-final}
+
+Where $\boxed{k}$ is the house number, and $\boxed{n}$ is the node number
+
+**Steady over the day:**
+
+At a given tap, the rise barely changes with demand (for example $0.0064~pu$ to $0.0066~pu$ at tap 15). So each inverter location $k$ has one number, that is the **sensitivity**. Recall @eq-voltage-change-final:
+
+$$\Delta V_{k, p.u.} \approx \left(X_{xfrmr}+\sum_{j=1}^{n} X_{ij}\right) \frac{\Delta Q_{k,inj}}{V^{2}_{base}}$$
+
+If we solve for the relationship between the voltage at any tap $V_{k,pu}$ and $Q$, we can rewrite the above equation as:
+
+$$
+\Delta V_{k, p.u.} \approx \left(\frac{X_{xfrmr}+\sum_{j=1}^{n} X_{ij}}{V_{base}^{2}}\right) \Delta Q_{k,inj}
+$$
+
+Then solve for the relationship between the voltage at any tap $V_{k,pu}$ and $Q$:
+
+$$
+\frac{\Delta V_{k, p.u.}}{\Delta Q_{k,inj}} \approx X_{xfrmr}+\sum_{j=1}^{n} X_{ij}
+$$
+
+The first term, $\frac{\Delta V_{k, p.u.}}{\Delta Q_{k,inj}}$, describes how injecting the reactive power at house $k$ affects the voltage at tap $n$. Thus, hereafter it is called $\zeta=\frac{\Delta V_{k, p.u.}}{\Delta Q_{k,inj}}=$**Voltage Sensitivity.**
+
+For instance, the voltage sensitivity at tap 15 is given by:
+
+
+$$\zeta_{n=15,k} = \frac{\Delta V_{n=15}}{\Delta Q_{k=15}} \left[\frac{p.u.}{kVAr}\right]$$
+
+and the $Q$ it needs is
+
+$$\Delta Q_{k} = \frac{V_{target} - V_{base}}{\zeta_{15,k}}$$
+
+### Therefore, the next steps are:
+
+- **Pick a voltage target (p.u.)**: For example, "the worst tap (tap 15) at 20:46 reaches $V_{target}$".
+
+- **Take S_15,k from the 44% location sweep:** we already have, for all 15 locations: $S = \frac{V_{rise,15}}{3.344~kVAr}$.
+
+- **Calculate $Q_{k}$:** with the formula above and check it against the limits: $3.344 kVAr$ for IEEE 1547 at $44\%$, or $7.6~kVAr$ for the full rating.
+
+- **Verify with one run per location:** Either GridLAB-D or the sweep script. If needed, correct once with $Q_{new} = \frac{Q + (V_{target} − V_{achieved})}{\zeta}$. The response bends slightly at high $Q$ (about $1.5\%$ between $44\%$ and $100\%$ at house $15$), so one correction should be enough.
+
+### Example with numbers in the previous sections
+
+Here the target is $V_{tap,15} = 0.970~pu$ at 20:46. The $V_{base}=0.9614 pu$, so the needed rise is $\Delta V = 0.0086~pu$.
+
+
+| Inverter at | Rise at Tap 15 (3.344 kvar) | $\zeta_{15,k}~\left(\frac{pu}{kVAr}\right)$ | $Q_{needed}\left(kVAr\right)$ |
+|:-----------:|---------------------------:|---------------------:|----------------:|
+| House 1     | 0.00433                    | 0.00130              | 6.6             |
+| House 8     | 0.00548                    | 0.00164              | 5.3             |
+| House 15    | 0.00661                    | 0.00198              | 4.4             |
+
+
+The $0.970~pu$ target is only an illustration. With it, the result is clear: the further down the feeder the inverter sits, the less Q it needs, because its Q passes through more of the impedance. An inverter at house 1 needs about $50\%$ more Q than one at house 15, and at $6.6~kVAr$ it would already exceed the IEEE 1547 limit of $3.344~kVAr$.
+
+### Two extensions we can do later
+
+- **Over the whole day:** since $\zeta$ barely changes with demand, $Q_{k}(t) = (V_{target} − V_{base}(t)) / \zeta_{15,k}$ gives a minute-by-minute Q schedule, clipped between 0 and the rating.
+
+- **Losses:** a lower $Q$ is also better for losses, since we saw the reactive current adds $I^{2}R$. So a far-down location wins twice: it needs less $Q$, and that $Q$ causes less loss.
+
 ## Setup
 
 1. Calibrate the base case. At a Node 4 voltage of 1.00 pu and the worst hour (20:46), the last house should sit between 0.95 and 0.97 pu. Adjust loading, secondary length or the conductor value until it does.
